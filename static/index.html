@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forest Detective · Bangladesh</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0d110e;--edge:#2a352a;--bone:#e8e3d3;--dim:#9aa593;--moss:#a5d36a;--flame:#ff6a2b;--clim:#5aa9e6;--hum:#e5694f;--mix:#e0b24a}
+*{box-sizing:border-box;margin:0}html,body{height:100%}
+body{background:var(--ink);color:var(--bone);font:14px/1.5 "Instrument Sans",system-ui,sans-serif;overflow:hidden}
+#map{position:fixed;inset:0;background:#0a0d0b;outline:none}
+.mono,kbd,.kick{font-family:"DM Mono",ui-monospace,monospace}
+.brand{position:fixed;top:16px;left:18px;z-index:800;pointer-events:none}
+.brand small{display:block;font:500 11px "DM Mono",monospace;letter-spacing:.16em;color:var(--bone);text-transform:uppercase;text-shadow:0 1px 8px #000}
+.brand h1{font:700 32px/1.05 Fraunces,Georgia,serif;letter-spacing:-.015em;text-shadow:0 2px 16px #000}.brand h1 i{color:var(--moss)}
+.stats{position:fixed;top:16px;right:416px;z-index:800;display:flex;gap:1px;background:var(--edge);border:1px solid var(--edge);border-radius:12px;overflow:hidden}
+.stat{background:#0d110eeb;padding:7px 16px;min-width:92px}.stat span{display:flex;gap:5px;align-items:center;font:500 10px "DM Mono",monospace;letter-spacing:.12em;color:var(--dim)}
+.stat b{font:700 22px Fraunces,serif}.stat svg{width:12px;height:12px}
+#panel{position:fixed;top:16px;right:16px;bottom:16px;width:384px;z-index:800;background:#0f140ff2;border:1px solid var(--edge);border-radius:18px;overflow:auto;padding:22px;display:flex;flex-direction:column;gap:18px;backdrop-filter:blur(10px);scrollbar-width:thin}
+.kick{font-size:11px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.place{font:700 30px/1.1 Fraunces,serif;letter-spacing:-.01em;margin-top:2px}.sub{color:var(--dim);font-size:13px}
+.verdict{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--c) 13%,transparent);border:1px solid color-mix(in srgb,var(--c) 50%,transparent)}
+.verdict i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}.verdict b{display:block;font:600 15px "Instrument Sans"}.verdict span{font:400 12px "DM Mono",monospace;color:var(--dim)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{border:1px solid var(--edge);border-radius:12px;padding:10px 12px}
+.tile span{font:400 10px "DM Mono",monospace;letter-spacing:.1em;color:var(--dim);text-transform:uppercase}.tile b{display:block;font:700 24px Fraunces,serif;margin-top:1px}.tile em{font:400 11px "DM Mono",monospace;color:var(--dim);font-style:normal}
+.sec h3{display:flex;justify-content:space-between;align-items:center;font:600 13px "Instrument Sans";margin-bottom:6px}
+canvas{width:100%;height:120px;display:block}.note{font-size:12px;color:var(--dim);margin-top:4px}
+.seg{display:flex;gap:2px;background:var(--edge);border-radius:8px;padding:2px}.seg button{background:none;color:var(--dim);padding:2px 10px;font:500 11px "DM Mono",monospace;border-radius:6px}.seg button.on{background:var(--bone);color:var(--ink)}
+button{font:inherit;border:0;cursor:pointer;color:var(--bone);background:none}
+.btn{background:var(--bone);color:var(--ink);font-weight:600;padding:9px 14px;border-radius:10px}.btn.ghost{background:none;border:1px solid var(--edge);color:var(--bone)}
+.sites{display:flex;flex-direction:column;gap:8px}.site{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:11px 12px;border:1px solid var(--edge);border-radius:12px}
+.site:hover{border-color:var(--c)}.site i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}.site b{flex:1;font-weight:600}.site span{font:400 12px "DM Mono",monospace;color:var(--dim)}
+input[type=date]{background:#0d110e;color:var(--bone);border:1px solid var(--edge);border-radius:8px;padding:6px 8px;font:12px "DM Mono",monospace;color-scheme:dark}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.actions{position:fixed;bottom:18px;left:50%;transform:translateX(calc(-50% - 200px));z-index:800;display:flex;gap:8px}
+.actions button{display:flex;gap:9px;align-items:center;background:#0d110eeb;border:1px solid var(--edge);border-radius:12px;padding:9px 14px;font-weight:600}
+.actions button:hover{border-color:var(--moss)}kbd{background:var(--bone);color:var(--ink);border-radius:5px;padding:0 6px;font-size:12px;font-weight:500}
+button:focus-visible,input:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+.leaflet-container{background:#0a0d0b;font-family:inherit}
+.leaflet-control-layers,.leaflet-bar a,.hud,.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#0d110eeb;color:var(--bone);border:1px solid var(--edge);border-radius:12px}
+.leaflet-control-layers{padding:6px 10px;font-size:13px}.leaflet-bar{border:0!important}.leaflet-bar a{border-radius:8px!important;margin-bottom:4px}
+.hud{padding:6px 12px;font:400 12px "DM Mono",monospace}.leaflet-control-attribution{background:#0d110ecc!important;color:var(--dim)!important}.leaflet-control-attribution a{color:var(--dim)!important}
+.zone{stroke-dasharray:3 9;stroke-linecap:round;animation:dash 20s linear infinite}@keyframes dash{to{stroke-dashoffset:-240}}
+.zl{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);white-space:nowrap;pointer-events:none}
+.zl .pin{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#0d110e;border:2px solid var(--zc);animation:pulse 2.8s infinite}.zl .pin svg{width:18px;height:18px;fill:var(--zc)}
+.zl .tag{margin-top:6px;background:#0d110ef0;border:1px solid var(--edge);border-left:3px solid var(--zc);border-radius:7px;padding:2px 9px;font:500 12px "Instrument Sans";color:var(--bone)}.zl .tag s{text-decoration:none;font:400 11px "DM Mono",monospace;color:var(--dim);margin-left:6px}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--zc) 60%,transparent)}70%{box-shadow:0 0 0 18px #0000}100%{box-shadow:0 0 0 0 #0000}}
+.fire svg{display:block;filter:drop-shadow(0 0 5px #ff6a2bcc);transform-origin:50% 90%;animation:flick 1.3s ease-in-out infinite alternate}@keyframes flick{to{transform:scale(1.12) rotate(-3deg)}}
+.me{--f:1;transition:filter .2s}.me svg{display:block;transform:scaleX(var(--f));overflow:visible}.me .sh{fill:#000a}
+.me .l{transform-origin:18px 39px}.me .r{transform-origin:26px 39px}.me .af{transform-origin:28px 25px}.me .ab{transform-origin:11px 25px}.me.walk .l{animation:sw .3s ease-in-out infinite alternate}.me.walk .r{animation:sw .3s ease-in-out infinite alternate-reverse}.me.walk .af{animation:sa .3s ease-in-out infinite alternate}.me.walk .ab{animation:sa .3s ease-in-out infinite alternate-reverse}
+.me.walk .bd{animation:bob .3s ease-in-out infinite alternate}@keyframes sw{from{transform:rotate(-30deg)}to{transform:rotate(30deg)}}@keyframes sa{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}@keyframes bob{to{transform:translateY(-1.8px)}}
+.me.dig .af{animation:dig .34s ease-in-out 3}.me.dig .ab{animation:dig2 .34s ease-in-out 3}.me.dig .bd{animation:squat .34s ease-in-out 3}@keyframes dig{50%{transform:rotate(42deg) translateY(5px)}}@keyframes dig2{50%{transform:rotate(30deg)}}@keyframes squat{50%{transform:translateY(3px)}}
+.seed{animation:pop .5s cubic-bezier(.2,2,.4,1)}.seed svg{width:22px;height:22px}@keyframes pop{from{transform:scale(0)}}
+#modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:9999}#modal.on{display:flex}
+#qbox{background:#0f140f;border:1px solid var(--edge);border-radius:18px;padding:24px;max-width:440px;width:100%}#qbox h2{font:700 24px/1.2 Fraunces,serif;margin:4px 0 10px}
+.opt{display:block;width:100%;text-align:left;margin-top:8px;padding:11px 14px;border:1px solid var(--edge);border-radius:10px}.opt:hover:not(:disabled){border-color:var(--bone)}.opt.ok{border-color:var(--moss);background:#1d2e14}.opt.no{border-color:var(--hum);background:#3a1b16}
+#toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-90px);background:var(--bone);color:var(--ink);padding:10px 18px;border-radius:12px;font-weight:600;transition:transform .3s;z-index:10000;max-width:90vw}#toast.on{transform:translate(-50%,0)}
+.leaflet-top.leaflet-left{top:92px}
+summary{cursor:pointer;font:600 13px "Instrument Sans"}details.sec .note{margin-top:8px}
+.clue{margin-top:8px;padding:11px 14px;border:1px solid var(--edge);border-left:3px solid var(--moss);border-radius:10px}.clue b{font:600 11px "DM Mono",monospace;color:var(--moss);text-transform:uppercase;letter-spacing:.1em}.clue p{margin-top:2px}
+.sec .btn{width:100%}
+@media(max-width:900px){#panel{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:42vh}.stats{right:10px;top:78px}.actions{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div id="map" tabindex="0"></div>
+<div class="brand"><small>Bangladesh · NASA Earth trends</small><h1>Forest <i>Detective</i></h1></div>
+<div class="stats"><div class="stat"><span>SEEDLINGS</span><b id="seeds">0</b></div><div class="stat"><span>SCORE</span><b id="score">0</b></div>
+<div class="stat" id="fstat"><span><svg viewBox="0 0 24 24" fill="#ff6a2b"><path d="M12 2c.8 3-1 4.6-2.4 6.6C8.300 10.500 8 12 9 13.500c-1.800-.3-3-2-3-4C4 11 3 13 3 15c0 4 4 7 9 7s9-3 9-7c0-3.600-2.500-5.500-4-8.500-.5 1.800-1.500 2.800-3 3.200C14.500 7.500 14.500 4.500 12 2z"/></svg>FIRES 5D</span><b id="fires">–</b></div></div>
+<aside id="panel"></aside>
+<div class="actions"><button onclick="plant()"><kbd>E</kbd>Dig &amp; plant</button><button onclick="openCase()"><kbd>C</kbd>Case file</button><button onclick="quiz()"><kbd>Q</kbd>Quiz</button><button onclick="fires()"><kbd>F</kbd>Refresh fires</button></div>
+<div id="modal"><div id="qbox"></div></div><div id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+const API=location.protocol==="file:"?"http://localhost:8000":"";
+const $=id=>document.getElementById(id);
+const CC={climate:"#5aa9e6",human:"#e5694f",mixed:"#e0b24a",none:"#cfd6c4"},CL={climate:"Climate-driven loss",human:"Human-driven loss",mixed:"Mixed causes"};
+const TREE='<svg viewBox="0 0 24 24"><path d="M12 2 5 12h4l-3 5h5v5h2v-5h5l-3-5h4z"/></svg>';
+const FLAME=z=>`<svg width="${z}" height="${z}" viewBox="0 0 24 24"><defs><linearGradient id="fg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#e8350f"/><stop offset=".6" stop-color="#ff8a2b"/><stop offset="1" stop-color="#ffd24a"/></linearGradient></defs><path fill="url(#fg)" d="M12 2c.8 3-1 4.6-2.4 6.6C8.300 10.500 8 12 9 13.500c-1.800-.3-3-2-3-4C4 11 3 13 3 15c0 4 4 7 9 7s9-3 9-7c0-3.600-2.500-5.500-4-8.500-.5 1.800-1.500 2.800-3 3.200C14.500 7.500 14.500 4.500 12 2z"/><path fill="#fff3b0" d="M12 21c-2.200 0-3.800-1.300-3.800-3.200 0-2 1.800-3 2.600-4.800.9 1.200 1.300 1.600 2.200 1.900.9.400 2.800 1.200 2.800 3.200 0 1.800-1.800 2.900-3.800 2.900z"/></svg>`;
+const ME=`<svg width="44" height="62" viewBox="0 0 44 62"><ellipse class="sh" cx="22" cy="58" rx="13" ry="3.5"/>
+<g class="bd">
+<g class="leg l"><rect x="15" y="38" width="6" height="15" rx="3" fill="#35432f"/><rect x="14" y="50" width="8" height="6" rx="2.5" fill="#2a1d14"/></g>
+<g class="leg r"><rect x="23" y="38" width="6" height="15" rx="3" fill="#35432f"/><rect x="22" y="50" width="8" height="6" rx="2.5" fill="#2a1d14"/></g>
+<rect x="5" y="22" width="11" height="17" rx="4" fill="#8a5a2b"/><rect x="5" y="22" width="11" height="5" rx="2.5" fill="#a06a33"/>
+<g class="arm ab"><rect x="8" y="23" width="6" height="15" rx="3" fill="#3f6230"/><circle cx="11" cy="38.5" r="3" fill="#d29f7b"/></g>
+<rect x="12" y="20" width="20" height="21" rx="6" fill="#58853f"/><rect x="12" y="35" width="20" height="3" fill="#2f4a22"/>
+<g class="arm af"><g transform="rotate(-12 29 37)"><rect x="27.8" y="21" width="2.4" height="32" rx="1" fill="#8b6a3d"/><path d="M24.5 51h9l-4.5 8z" fill="#aeb7b0"/></g>
+<rect x="25" y="23" width="6" height="15" rx="3" fill="#4a7234"/><circle cx="29" cy="38" r="3" fill="#e2b08a"/></g>
+<circle cx="22" cy="14" r="7.5" fill="#e2b08a"/><circle cx="25" cy="14" r="1.2" fill="#2a1d14"/><path d="M20 18q3 2 6 0" stroke="#a5724f" stroke-width="1" fill="none"/>
+<ellipse cx="22" cy="9.5" rx="14" ry="3.3" fill="#c9a45a"/><path d="M14 9.5C14 3 30 3 30 9.5z" fill="#dcb96e"/><rect x="14" y="7.5" width="16" height="2.6" fill="#7a4a1c"/></g></svg>`;
+const SEED='<svg viewBox="0 0 24 24"><path d="M12 22V11" stroke="#6b9a3a" stroke-width="2" stroke-linecap="round"/><path d="M12 12C6 12 4 8 4 4c5 0 8 2 8 8z" fill="#a5d36a"/><path d="M12 14c5 0 7-3 7-7-4.500 0-7 2.500-7 7z" fill="#7fb04a"/></svg>';
+const HOT=[
+ {n:"Sundarbans",lat:22.1,lon:89.2,r:35,note:"The world's largest mangrove forest. Pressure: rising salinity, sea-level rise, cyclones.",q:[["The Sundarbans is best known as?",["Largest mangrove forest","A desert","A glacier"],0],["Which climate effect hurts it most?",["Rising salinity","Colder winters","Less sunlight"],0]]},
+ {n:"Chittagong Hill Tracts",lat:22.7,lon:92.1,r:40,note:"Hill forests under pressure from shifting cultivation, logging and new roads.",q:[["Which layer helps spot illegal clearing?",["Tree-cover loss near roads","Ocean tides","Moon phase"],0],["A major driver of hill forest loss?",["Clearing for farming","Snowfall","Volcanoes"],0]]},
+ {n:"Sylhet hill forests",lat:24.9,lon:91.9,r:30,note:"Tea expansion and irregular rainfall are squeezing the hills.",q:[["What does NDVI measure?",["Vegetation greenness","Wind speed","Soil salt"],0],["Which crop expansion affects Sylhet?",["Tea","Wheat prairie","Cactus"],0]]},
+ {n:"Madhupur Sal forest",lat:24.65,lon:90.05,r:25,note:"Sal forest cleared for farms, brick kilns and encroachment.",q:[["Madhupur is famous for which tree?",["Sal","Pine","Baobab"],0],["Is its loss mostly climate-driven?",["No, mostly human pressure","Yes, entirely","It is not changing"],0]]},
+ {n:"Cox's Bazar coast",lat:21.45,lon:92.0,r:30,note:"Coastal green belt facing storms, erosion and shifting rainfall.",q:[["Which satellite family gives 30 m forest imagery?",["Landsat","Voyager","Apollo"],0],["Why plant coastal belts?",["Reduce storm damage","Make snow","Shade on Mars"],0]]}];
+const BBOX=[[20.6,88.0],[26.7,92.7]];
+
+/* ---------- map ---------- */
+const map=L.map("map",{zoomControl:false,maxBounds:[[19,86],[28,94]],minZoom:6}).setView([23.7,90.3],7);
+L.control.zoom({position:"bottomleft"}).addTo(map);
+const pad=n=>String(n).padStart(2,"0"),iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const date0=new Date(Date.now()-3*864e5);
+function gibs(layer,lvl,ext,snap){const t=L.tileLayer("",{maxNativeZoom:lvl,maxZoom:12,attribution:"NASA GIBS"});
+ t.getTileUrl=c=>{let d=new Date($("dt")?$("dt").value:date0);if(isNaN(d))d=date0;if(snap){d=new Date(d-16*864e5);const j=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);d=new Date(d-((j-1)%8)*864e5)}
+  return `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layer}/default/${iso(d)}/GoogleMapsCompatible_Level${lvl}/${c.z}/${c.y}/${c.x}.${ext}`};return t}
+const esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,attribution:"Esri, Maxar, Earthstar"}).addTo(map);
+const modis=gibs("MODIS_Terra_CorrectedReflectance_TrueColor",9,"jpeg"),ndvi=gibs("MODIS_Terra_NDVI_8Day",9,"png",true);
+const loss=L.tileLayer("https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.11/loss_tree_gain/{z}/{x}/{y}.png",{maxNativeZoom:12,maxZoom:12,attribution:"Hansen/UMD/Google/USGS/NASA"});
+const fireG=L.layerGroup().addTo(map),natG=L.layerGroup().addTo(map);
+L.control.layers({"Satellite · Esri":esri,"NASA MODIS · daily":modis},{"Vegetation index · NASA MODIS":ndvi,"Forest loss · Hansen":loss,"National model grid":natG,"Active fires · NASA FIRMS":fireG},{position:"topleft",collapsed:false}).addTo(map);
+let divs=[];
+fetch("https://www.geoboundaries.org/api/current/gbOpen/BGD/ADM1/").then(r=>r.json()).then(m=>fetch(m.gjDownloadURL)).then(r=>r.json()).then(g=>{divs=g.features;
+ L.geoJSON(g,{style:{color:"#e8e3d3",weight:1,dashArray:"2 6",fill:false,opacity:.55},interactive:false}).addTo(map)}).catch(()=>{});
+const inRing=(p,r)=>{let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[xi,yi]=r[i],[xj,yj]=r[j];if((yi>p[1])!=(yj>p[1])&&p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi)c=!c}return c};
+const divAt=(la,lo)=>{for(const f of divs){const g=f.geometry,ps=g.type==="Polygon"?[g.coordinates]:g.coordinates;if(ps.some(p=>inRing([lo,la],p[0])))return f.properties.shapeName}return null};
+const zIcon=(h,c,t)=>L.divIcon({className:"",iconSize:[0,0],html:`<div class="zl" style="--zc:${c}"><div class="pin">${TREE}</div><div class="tag">${h.n}${t?`<s>${t}</s>`:""}</div></div>`});
+HOT.forEach(h=>{h.circ=L.circle([h.lat,h.lon],{radius:h.r*1000,color:CC.none,weight:2,fillColor:CC.none,fillOpacity:.09,className:"zone",interactive:false}).addTo(map);
+ h.lab=L.marker([h.lat,h.lon],{icon:zIcon(h,CC.none,""),interactive:false,zIndexOffset:2000}).addTo(map)});
+async function prefetch(){for(const h of HOT){try{const r=await fetch(`${API}/api/forest?lat=${h.lat}&lon=${h.lon}`);if(!r.ok)continue;h.data=await r.json();
+ const c=CC[h.data.cause];h.circ.setStyle({color:c,fillColor:c});h.lab.setIcon(zIcon(h,c,Math.round(h.data.cover.at(-1))+"%"));if(!cur)render()}catch(e){}}}
+const hud=L.control({position:"bottomleft"});hud.onAdd=()=>{const d=L.DomUtil.create("div","hud");d.id="hud";L.DomEvent.disableClickPropagation(d);return d};hud.addTo(map);
+
+/* ---------- character ---------- */
+const me={lat:22.6,lon:89.4,dir:1},keys={};
+const mk=L.marker([me.lat,me.lon],{icon:L.divIcon({className:"",html:`<div class="me" id="me">${ME}</div>`,iconSize:[44,62],iconAnchor:[22,58]}),zIndexOffset:1000}).addTo(map);
+map.on("click",e=>{me.lat=e.latlng.lat;me.lon=e.latlng.lng;moved()});
+let cur=null,seeds=0,score=0,cause=null,rid=0,cl=null,fc=null,fcErr="",mode="T2M";
+const km=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=Math.sin((c-a)*p/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+function loop(){const px=3.6*360/(256*2**map.getZoom());let m=false;
+ if(keys.arrowup||keys.w){me.lat+=px;m=true}if(keys.arrowdown||keys.s){me.lat-=px;m=true}
+ if(keys.arrowleft||keys.a){me.lon-=px;m=true;me.dir=-1}if(keys.arrowright||keys.d){me.lon+=px;m=true;me.dir=1}
+ const el=mk.getElement();if(el){el.classList.toggle("walk",m);el.style.setProperty("--f",me.dir)}
+ if(m){me.lat=Math.min(BBOX[1][0],Math.max(BBOX[0][0],me.lat));me.lon=Math.min(BBOX[1][1],Math.max(BBOX[0][1],me.lon));moved()}requestAnimationFrame(loop)}
+let ft;function moved(){mk.setLatLng([me.lat,me.lon]);map.panTo([me.lat,me.lon],{animate:false});
+ $("hud").textContent=`${me.lat.toFixed(3)}°N  ${me.lon.toFixed(3)}°E  ·  ${divAt(me.lat,me.lon)||"Bangladesh"}`;
+ const h=HOT.find(h=>km(me.lat,me.lon,h.lat,h.lon)<h.r);if(h!==cur){cur=h||null;if(cur)toast("Entered "+cur.n);ft=0}
+ clearTimeout(ft);ft=setTimeout(analyse,450)}
+addEventListener("keydown",e=>{const k=e.key.toLowerCase();if($("modal").classList.contains("on")){if(k==="escape")closeQ();return}
+ if(e.target.tagName==="INPUT")return;if(k.startsWith("arrow"))e.preventDefault();keys[k]=true;if(k==="e")plant();if(k==="q")quiz();if(k==="c")openCase();if(k==="f")fires()});
+addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+function jump(i){const h=HOT[i];me.lat=h.lat;me.lon=h.lon;map.setZoom(9);moved()}
+
+/* ---------- NASA POWER climate ---------- */
+const pc={};
+async function power(lat,lon){const k=(Math.round(lat*2)/2)+","+(Math.round(lon*2)/2);if(pc[k])return pc[k];const[la,lo]=k.split(",");
+ const j=await (await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=T2M,PRECTOTCORR&community=AG&latitude=${la}&longitude=${lo}&start=2001&end=2024&format=JSON`)).json(),p=j.properties.parameter,o={years:[],T2M:[],PRECTOTCORR:[]};
+ for(let y=2001;y<=2024;y++){const t=p.T2M[y+"13"],r=p.PRECTOTCORR[y+"13"];if(t>-90&&r>-90){o.years.push(y);o.T2M.push(t);o.PRECTOTCORR.push(r)}}return pc[k]=o}
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length,sd=a=>{const m=mean(a);return Math.sqrt(mean(a.map(v=>(v-m)**2)))||1};
+const fit=(x,y)=>{const mx=mean(x),my=mean(y);let n=0,d=0;x.forEach((v,i)=>{n+=(v-mx)*(y[i]-my);d+=(v-mx)**2});const s=n/d;return{s,b:my-s*mx}};
+async function analyse(){const id=++rid;fc=null;fcErr="";cl=null;render(true);
+ try{cl=await power(me.lat,me.lon);cl.fT=fit(cl.years,cl.T2M);cl.fR=fit(cl.years,cl.PRECTOTCORR)}catch(e){}
+ if(id!==rid)return;render(true);
+ try{const q=cur?[cur.lat,cur.lon]:[Math.floor(me.lat/.5)*.5+.25,Math.floor(me.lon/.5)*.5+.25];   /* reuse cached grid cells */
+  const r=await fetch(`${API}/api/forest?lat=${q[0]}&lon=${q[1]}`);if(r.ok)fc=await r.json();else fcErr=r.status===422?"No tree-cover data here (water or no trees)":((await r.json()).detail||"error")}catch(e){fcErr="backend offline"}
+ if(id!==rid)return;render(false)}
+
+/* ---------- panel ---------- */
+function chart(c,ys,vs,fy,fv,col,lo,hi){const dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;const x=c.getContext("2d");x.scale(dpr,dpr);
+ if(!ys){x.fillStyle="#9aa593";x.font="12px DM Mono,monospace";x.textAlign="center";x.fillText("waiting for data…",w/2,h/2);return}
+ const A=[...ys,...fy],V=[...vs,...fv],all=[...V,...(lo||[]),...(hi||[])],mn=Math.min(...all),mx=Math.max(...all),pd=(mx-mn)*.12||1,L0=30,B=18;
+ const X=i=>L0+i/(A.length-1)*(w-L0-4),Y=v=>h-B-(v-mn+pd)/(mx-mn+2*pd)*(h-B-6);
+ x.strokeStyle="#2a352a";x.fillStyle="#9aa593";x.font="10px DM Mono,monospace";x.textAlign="right";x.lineWidth=1;
+ for(let k=0;k<3;k++){const v=mn+(mx-mn)*k/2;x.beginPath();x.moveTo(L0,Y(v));x.lineTo(w,Y(v));x.stroke();x.fillText(v.toFixed(v<10?1:0),L0-4,Y(v)+3)}
+ [0,A.length>>1,A.length-1].forEach(i=>{x.textAlign=i==0?"left":i==A.length-1?"right":"center";x.fillText(A[i],i==0?L0:X(i),h-4)});
+ const n=ys.length-1,g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,col+"55");g.addColorStop(1,col+"00");
+ x.beginPath();for(let i=0;i<=n;i++)i?x.lineTo(X(i),Y(V[i])):x.moveTo(X(i),Y(V[i]));x.lineTo(X(n),h-B);x.lineTo(X(0),h-B);x.fillStyle=g;x.fill();
+ if(lo&&hi){x.beginPath();x.moveTo(X(n),Y(vs[n]));hi.forEach((v,j)=>x.lineTo(X(n+1+j),Y(v)));for(let j=lo.length-1;j>=0;j--)x.lineTo(X(n+1+j),Y(lo[j]));x.closePath();x.fillStyle="#e0b24a30";x.fill()}
+ const ln=(a,b,cc,d)=>{x.beginPath();x.setLineDash(d);x.strokeStyle=cc;x.lineWidth=2;for(let i=a;i<=b;i++)i==a?x.moveTo(X(i),Y(V[i])):x.lineTo(X(i),Y(V[i]));x.stroke();x.setLineDash([])};
+ ln(0,n,col,[]);ln(n,A.length-1,"#e0b24a",[5,4])}
+function render(loading){const P=$("panel"),dv=divAt(me.lat,me.lon);
+ let c=null,pr=null;
+ if(fc){c=fc.cause;pr=fc.cause_prob}
+ else if(cl){const T=cl.T2M,R=cl.PRECTOTCORR,zT=(mean(T.slice(-5))-mean(T.slice(0,-5)))/sd(T),zR=(mean(R.slice(-5))-mean(R.slice(0,-5)))/sd(R);
+  if(!loading){c=(zT>.8||zR<-.8)?"climate":"human";pr=null}}
+ cause=c;
+ const idle=!cur;
+ let h=`<div><div class="kick">${cur?"Now reading":"Free roam"}</div><div class="place">${cur?cur.n:(dv||"Bangladesh")}</div><div class="sub">${cur?cur.note:"Walk into a ringed forest, or pick one below."}</div></div>`;
+ if(c)h+=`<div class="verdict" style="--c:${CC[c]}"><i></i><div><b>${CL[c]}</b><span>${pr!=null?Math.round(pr*100)+"% conf."+(fc&&fc.cause_p_value!=null?" · p="+fc.cause_p_value:""):"climate signal only · backend offline"}</span></div></div>`;
+ else h+=`<div class="verdict" style="--c:${CC.none}"><i></i><div><b>${loading?"Reading satellite records…":"No data here"}</b><span>${fcErr||(loading&&cl?"Downloading MODIS tree cover… first visit can take ~30 s":"NASA POWER · MODIS")}</span></div></div>`;
+ if(cur)h+=`<button class="btn" onclick="openCase()">Open case file${cases[cur.n]&&cases[cur.n].solved?" · solved":""}</button>`;
+ const cv=fc?fc.cover.at(-1):null,fe=fc?fc.forecast.at(-1):null;
+ h+=`<div class="tiles"><div class="tile"><span>Tree cover ${fc?fc.years.at(-1):""}</span><b>${cv!=null?cv.toFixed(0)+"%":"—"}</b></div>
+ <div class="tile"><span>Forecast 2035</span><b>${fe!=null?fe.toFixed(0)+"%":"—"}</b>${cv!=null?`<em>${(fe-cv>=0?"+":"")+(fe-cv).toFixed(1)} pts</em>`:""}</div>
+ <div class="tile"><span>Loss in stress yrs</span><b>${fc?Math.round(fc.climate_loss_share*100)+"%":"—"}</b></div>
+ <div class="tile"><span>Warming / decade</span><b>${cl?(cl.fT.s*10).toFixed(2)+"°":"—"}</b></div></div>
+ <div class="sec"><h3>Forest cover · MODIS + model</h3><canvas id="fc"></canvas><div class="note">${fc?`Held-out error ±${fc.holdout_mae_pct??"?"} pts · dashed = forecast, shaded = 80% range`:(fcErr?"Backend: "+fcErr:"Loading tree-cover record…")}</div></div>
+ <div class="sec"><h3>Climate · NASA POWER<span class="seg"><button class="${mode=="T2M"?"on":""}" onclick="mode='T2M';drawC()">TEMP</button><button class="${mode!="T2M"?"on":""}" onclick="mode='PRECTOTCORR';drawC()">RAIN</button></span></h3><canvas id="ch"></canvas><div class="note">Observed 2001–2024, linear projection to 2035.</div></div>`;
+ if(idle)h+=`<div class="sec"><h3>Forest sites</h3><div class="sites">${HOT.map((z,i)=>`<button class="site" style="--c:${z.data?CC[z.data.cause]:CC.none}" onclick="jump(${i})"><i></i><b>${z.n}</b><span>${z.data?Math.round(z.data.cover.at(-1))+"%":"…"}</span></button>`).join("")}</div></div>`;
+ h+=natHTML()+`<div class="sec"><h3>Satellite date</h3><div class="row"><input type="date" id="dt" value="${$("dt")?$("dt").value:iso(date0)}" onchange="[modis,ndvi].forEach(l=>map.hasLayer(l)&&l.redraw())"><button class="btn ghost" onclick="lapse()">Play 2012 → now</button></div></div>`;h+=METHOD;
+ const keep=P.scrollTop;P.innerHTML=h;P.scrollTop=keep;
+ if(fc)chart($("fc"),fc.years,fc.cover,fc.forecast_years,fc.forecast,"#a5d36a",fc.forecast_lo,fc.forecast_hi);else chart($("fc"));drawC()}
+function drawC(){const c=$("ch");if(!c)return;document.querySelectorAll(".seg button").forEach((b,i)=>b.classList.toggle("on",(i==0)==(mode=="T2M")));
+ if(!cl)return chart(c);const f=mode=="T2M"?cl.fT:cl.fR,fy=[...Array(11)].map((_,i)=>2025+i);chart(c,cl.years,cl[mode],fy,fy.map(y=>f.s*y+f.b),mode=="T2M"?"#e5694f":"#5aa9e6")}
+let tm;function lapse(){if(tm){clearInterval(tm);tm=0;return}if(!map.hasLayer(modis)){esri.remove();modis.addTo(map)}
+ let y=2012;tm=setInterval(()=>{const d=new Date($("dt").value);d.setFullYear(y);$("dt").value=iso(d);modis.redraw();toast("MODIS · "+y);if(++y>new Date().getFullYear()){clearInterval(tm);tm=0}},1800)}
+
+/* ---------- fires (NASA FIRMS via backend) ---------- */
+let FR=[];function plotFires(rows){FR=rows;fireG.clearLayers();
+ rows.forEach(c=>{const z=Math.round(20+Math.min(18,(+c.frp||1)/2));
+  L.marker([+c.latitude,+c.longitude],{icon:L.divIcon({className:"fire",iconSize:[z,z],iconAnchor:[z/2,z-2],html:FLAME(z)})}).addTo(fireG)
+  .bindPopup(`<b>Fire detected</b><br>${c.acq_date} ${String(c.acq_time||"").padStart(4,"0").replace(/(..)(..)/,"$1:$2")} UTC<br>Power ${c.frp||"?"} MW · confidence ${c.confidence||"?"}`)});
+ $("fires").textContent=rows.length;$("fstat").title="NASA FIRMS · VIIRS · last 5 days";if(!rows.length)toast("FIRMS connected: no fires detected in Bangladesh in the last 5 days.")}
+async function fires(){try{const r=await fetch(API+"/api/fires"),j=await r.json();if(!r.ok)throw new Error(j.detail||("HTTP "+r.status));plotFires(j)}
+ catch(e){$("fires").textContent="off";$("fstat").title=e.message;toast("Fires: "+e.message)}}
+
+/* ---------- game ---------- */
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t.h);t.h=setTimeout(()=>t.classList.remove("on"),3000)}
+function plant(){if(!cur)return toast("Walk into a ringed forest first.");if(!(cases[cur.n]&&cases[cur.n].solved))return toast("Solve this site's case file first (press C).");const el=mk.getElement();el.classList.add("dig");setTimeout(()=>el.classList.remove("dig"),1000);
+ const cz=cur.data?cur.data.cause:cause;if(cz!=="climate"&&cz!=="mixed")return toast(cz==="human"?"Human-driven loss here: protect the forest, planting alone won't hold.":"Still reading this site's data…");
+ setTimeout(()=>{L.marker([me.lat+(Math.random()-.5)*.03,me.lon+(Math.random()-.5)*.03],{icon:L.divIcon({className:"",html:`<div class="seed">${SEED}</div>`,iconSize:[22,22],iconAnchor:[11,20]})}).addTo(map);
+  seeds++;$("seeds").textContent=seeds;toast("Seedling planted in "+cur.n)},500)}
+function closeQ(){$("modal").classList.remove("on");$("map").focus()}
+function quiz(){if(!cur)return toast("Walk into a ringed forest for its quiz.");const qs=cur.q,b=$("qbox");let i=0;
+ const show=()=>{if(i>=qs.length){b.innerHTML=`<div class="kick">${cur.n}</div><h2>Quiz complete</h2><p>Total score: <b>${score}</b></p><br><button class="btn" onclick="closeQ()">Back to the map</button>`;return}
+  const[q,o,a]=qs[i];b.innerHTML=`<div class="kick">${cur.n} · ${i+1} of ${qs.length}</div><h2>${q}</h2>`+o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join("");
+  b.querySelectorAll(".opt").forEach(z=>z.onclick=()=>{b.querySelectorAll(".opt").forEach(y=>y.disabled=true);b.querySelectorAll(".opt")[a].classList.add("ok");
+   if(+z.dataset.k===a){score+=10;$("score").textContent=score}else z.classList.add("no");setTimeout(()=>{i++;show()},900)})};
+ $("modal").classList.add("on");show()}
+
+/* ---------- national model grid + validation ---------- */
+let NAT=null,natMode="loss",VAL=null;const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),sgn=v=>(v>=0?"+":"")+v.toFixed(1);
+function natColor(c){if(natMode==="cause")return CC[c.cause];const t=clamp(-(natMode==="loss"?c.delta:c.fc_delta)/20,0,1),a=[95,158,79],z=[229,105,79];return`rgb(${a.map((v,i)=>Math.round(v+(z[i]-v)*t)).join(",")})`}
+function drawNat(){natG.clearLayers();(NAT?NAT.cells:[]).forEach(c=>L.rectangle([[c.lat-.25,c.lon-.25],[c.lat+.25,c.lon+.25]],{weight:0,fillColor:natColor(c),fillOpacity:.5})
+ .addTo(natG).bindTooltip(`${c.cover0.toFixed(0)}% → ${c.cover1.toFixed(0)}% (${sgn(c.delta)} pts)<br>2035 forecast: ${c.fc.toFixed(0)}%<br>${CL[c.cause]}`))}
+async function loadNational(){try{NAT=await (await fetch(API+"/api/national")).json();drawNat();render();
+ if(NAT.running)setTimeout(loadNational,12000);else if(!VAL){const v=await fetch(API+"/api/validate");if(v.ok){VAL=await v.json();render()}}}catch(e){}}
+function natHTML(){const s=NAT&&NAT.summary;
+ let h=`<div class="sec"><h3>National model grid<span class="seg">${[["loss","LOSS"],["cause","CAUSE"],["fc","2035"]].map(([m,l])=>`<button class="${natMode==m?"on":""}" onclick="natMode='${m}';drawNat();render()">${l}</button>`).join("")}</span></h3>`;
+ if(!NAT)h+=`<div class="note">Waiting for backend…</div>`;
+ else{h+=`<div class="note">${NAT.done}/${NAT.total} cells processed${NAT.running?" · computing in background…":""}${NAT.skipped?` · ${NAT.skipped} water cells skipped`:""}${NAT.failed?` · ${NAT.failed} errors`:""}</div>`;
+  if(s&&s.n)h+=`<div class="note">Across ${s.n} forested cells: tree cover ${sgn(s.mean_delta)} pts on average since ${s.year0}. Loss linked to climate in ${s.climate}%, to human pressure in ${s.human}%, mixed in ${s.mixed}%.</div>`}
+ if(VAL)h+=`<div class="note"><b>Validation:</b> median held-out forecast error ±${VAL.median_mae} pts${VAL.median_naive!=null?` (repeat-last-year baseline ±${VAL.median_naive}; model wins in ${VAL.pct_beats_naive}% of cells)`:""}; cause label beats chance (p≤0.15) in ${VAL.pct_beats_chance}% of cells.${VAL.gfw?` Agreement with GFW drivers: ${VAL.gfw.agreement}% (n=${VAL.gfw.n}).`:" GFW agreement not run yet (add gfw_drivers.csv)."}</div>`;
+ return h+"</div>"}
+const METHOD=`<details class="sec"><summary>Method &amp; limits</summary><p class="note">Data: MODIS MOD44B tree cover (250 m, yearly), NASA POWER climate, NASA FIRMS fires. Forecast: ridge regression on year plus temperature and rain anomalies, with an 80% range from a residual bootstrap. Cause: share of tree-cover loss in hot or dry years compared with chance, tested by circular-shift permutations (p-value).</p><p class="note">Limits: about 20 yearly points per site; association is not proof of cause; MODIS pixels are coarse; the forecast assumes past climate trends continue. Check against ground truth before using it for policy.</p></details>`;
+
+/* ---------- case files ---------- */
+const cases={};let CASE=null;
+async function openCase(){if(!cur)return toast("Walk into a ringed forest to open its case file.");const d=cur.data;if(!d)return toast("Still gathering evidence for this site…");
+ let c=null;try{c=await power(cur.lat,cur.lon);c.fT=fit(c.years,c.T2M);c.fR=fit(c.years,c.PRECTOTCORR)}catch(e){}
+ const st=cases[cur.n]||(cases[cur.n]={used:{},solved:false}),near=FR.filter(f=>km(+f.latitude,+f.longitude,cur.lat,cur.lon)<cur.r).length,ev=d.loss_events||[],dl=d.cover.at(-1)-d.cover[0];
+ const clues=[["Canopy record",`MODIS tree cover went from ${d.cover[0].toFixed(0)}% in ${d.years[0]} to ${d.cover.at(-1).toFixed(0)}% in ${d.years.at(-1)} (${sgn(dl)} points).`],
+  ["Climate file",c?`Temperature trend ${(c.fT.s*10).toFixed(2)} °C per decade. Rainfall trend ${(c.fR.s*10).toFixed(2)} mm/day per decade (NASA POWER).`:"Climate record unavailable."],
+  ["Fire watch",`${near} live VIIRS fire detection${near==1?"":"s"} inside this site in the last 5 days. This is live data, not history.`],
+  ["Loss timeline",ev.length?ev.map(e=>`${e.year}: ${sgn(-e.drop)} pts in a ${e.stressed?"hot or dry period":"normal climate period"}`).join(" · "):"No sharp yearly drops recorded."]];
+ CASE={st,d,clues};caseDraw();$("modal").classList.add("on")}
+function caseDraw(){const{st,d,clues}=CASE,n=Object.keys(st.used).length,pts=Math.max(10,40-8*n),b=$("qbox");
+ const res=()=>{const ok=st.guess===d.cause;return`<div class="verdict" style="--c:${CC[d.cause]};margin-top:14px"><i></i><div><b>Model verdict: ${CL[d.cause]}</b><span>${Math.round(d.cause_prob*100)}% conf. · p=${d.cause_p_value??"n/a"} · you ${ok?"matched it":"differed"} (+${st.pts})</span></div></div>
+  <p class="note">${d.cause==="human"?"Loss is not explained by hot or dry years, which points to clearing. Protect and patrol; planting alone will not hold here.":"Loss lines up with hot or dry years. Press E to dig and plant a climate-resilient seedling."} This is a statistical association from ${d.years.length} yearly points, not proof of cause.</p>`};
+ b.innerHTML=`<div class="kick">Case file · ${cur.n}</div><h2>What is driving the loss here?</h2><p class="note">Examine evidence, then accuse. Fewer clues, more points${st.solved?"":` (${pts} now)`}.</p>`+
+  clues.map((k,i)=>st.used[i]||st.solved?`<div class="clue"><b>${k[0]}</b><p>${k[1]}</p></div>`:`<button class="opt" onclick="CASE.st.used[${i}]=1;caseDraw()">Examine: ${k[0]}</button>`).join("")+
+  (st.solved?res():`<div class="row" style="margin-top:14px">${["climate","human","mixed"].map(x=>`<button class="btn ghost" style="flex:1;border-color:${CC[x]}" onclick="accuse('${x}')">${x[0].toUpperCase()+x.slice(1)}</button>`).join("")}</div>`)+
+  `<div class="row" style="margin-top:14px"><button class="btn ghost" onclick="closeQ()">Close</button></div>`}
+function accuse(g){const{st,d}=CASE,n=Object.keys(st.used).length;st.guess=g;st.solved=true;st.pts=g===d.cause?Math.max(10,40-8*n):5;score+=st.pts;$("score").textContent=score;caseDraw();render()}
+moved();loop();fires();prefetch();loadNational();
+</script></body></html>

@@ -5,6 +5,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from analysis import analyse
+from trend import analyse_monthly, stats_annual, VARS
+from trend import analyse_monthly, stats_annual, VARS
 
 import re
 
@@ -209,6 +211,70 @@ def validate():
             tot += 1; agree += (m == g)
         if tot: out["gfw"] = {"agreement": round(100 * agree / tot), "n": tot, "skipped": skipped}
     return out
+
+# ---------------- Trend Lab: any NASA POWER variable + tree cover, with significance tests ----------------
+POWER_NAMES = [k for k in VARS if k != "TREECOVER"]
+def power_monthly(lat, lon):
+    def go():
+        base = {"community": "AG", "latitude": lat, "longitude": lon, "start": 2001, "end": time.gmtime().tm_year - 1, "format": "JSON"}
+        url = "https://power.larc.nasa.gov/api/temporal/monthly/point"
+        try: return _get(url, params={**base, "parameters": ",".join(POWER_NAMES)})["properties"]["parameter"]
+        except Exception as e:
+            print("POWER batch failed, trying one by one:", e); out = {}
+            for n in POWER_NAMES:
+                try: out.update(_get(url, params={**base, "parameters": n})["properties"]["parameter"])
+                except Exception as e2: print("POWER variable failed", n, e2)
+            return out
+    return _cached(f"pwall_{lat:.1f}_{lon:.1f}.json", go)
+
+@app.get("/api/trend")
+def trend(lat: float, lon: float, vars: str = "all"):
+    want = POWER_NAMES if vars == "all" else vars.split(","); res = {}; pw = None
+    for v in want:
+        try:
+            if v == "TREECOVER":
+                tc = tree_cover(round(lat, 2), round(lon, 2)); res[v] = stats_annual(v, [y for y, _ in tc], [x for _, x in tc])
+            elif v in VARS:
+                if pw is None: pw = power_monthly(round(lat * 2) / 2, round(lon * 2) / 2)
+                if v in pw: res[v] = analyse_monthly(v, pw[v])
+        except Exception as e: print("trend skipped", v, e)
+    if not res: raise HTTPException(422, "no trend data for this location")
+    return {"lat": lat, "lon": lon, "results": res}
+
+
+# ---------------- Trend Lab: any variable, any place, slope + significance ----------------
+POWER_ALL = [v for v in VARS if v != "TREECOVER"]
+POWER_URL = "https://power.larc.nasa.gov/api/temporal/monthly/point"
+
+def power_monthly(lat, lon):
+    def go():
+        base = {"community": "AG", "latitude": lat, "longitude": lon, "start": 2001, "end": time.gmtime().tm_year - 1, "format": "JSON"}
+        try:
+            return _get(POWER_URL, params={**base, "parameters": ",".join(POWER_ALL)})["properties"]["parameter"]
+        except Exception as e:
+            print("POWER batch failed, trying one by one:", e)
+            out = {}
+            for v in POWER_ALL:
+                try: out.update(_get(POWER_URL, params={**base, "parameters": v})["properties"]["parameter"])
+                except Exception as e2: print("POWER variable failed:", v, e2)
+            return out
+    return _cached(f"pwall_{lat:.1f}_{lon:.1f}.json", go)
+
+@app.get("/api/trend")
+def trend(lat: float, lon: float, vars: str = "all"):
+    want = POWER_ALL if vars == "all" else [v.strip() for v in vars.split(",") if v.strip()]
+    res, pw = {}, None
+    for v in want:
+        try:
+            if v == "TREECOVER":
+                tc = tree_cover(round(lat, 2), round(lon, 2))
+                res[v] = stats_annual(v, [y for y, _ in tc], [x for _, x in tc])
+            elif v in VARS:
+                if pw is None: pw = power_monthly(round(lat * 2) / 2, round(lon * 2) / 2)
+                if v in pw: res[v] = analyse_monthly(v, pw[v])
+        except Exception as e: print("trend skipped", v, e)
+    if not res: raise HTTPException(502, "no trend data could be computed for this place")
+    return {"lat": lat, "lon": lon, "results": res}
 
 @app.get("/api/health")
 def health(): return {"ok": True, "firms": bool(FIRMS_KEY)}

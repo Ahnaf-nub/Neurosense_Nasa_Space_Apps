@@ -30,8 +30,13 @@ def _load_env():
 
 FIRMS_KEY, _KEYNAME = _load_env()
 print("FIRMS key:", ("loaded from " + _KEYNAME) if FIRMS_KEY else "NOT FOUND (put FIRMS_KEY=... in .env next to main.py)")
-BASE = pathlib.Path(__file__).resolve().parent
-CACHE = BASE / "cache"; CACHE.mkdir(exist_ok=True)
+import os
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent
+
+CACHE = Path("/tmp/cache")
+CACHE.mkdir(parents=True, exist_ok=True)
 STATIC = BASE / "static"
 MODIS = "https://modis.ornl.gov/rst/api/v1"
 

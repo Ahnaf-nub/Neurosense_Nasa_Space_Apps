@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Forest Detective · Bangladesh</title>
+<title>Forest Detective · Worldwide</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -37,6 +37,7 @@ input[type=date]{background:#11271b;color:var(--bone);border:1px solid var(--edg
 .actions button:hover{border-color:var(--moss)}kbd{background:var(--bone);color:var(--ink);border-radius:5px;padding:0 6px;font-size:12px;font-weight:500}
 button:focus-visible,input:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
 .leaflet-container{background:#0c1d13;font-family:inherit}
+.leaflet-layer.base img.leaflet-tile{mix-blend-mode:plus-lighter}
 .leaflet-control-layers,.leaflet-bar a,.hud,.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#11271beb;color:var(--bone);border:1px solid var(--edge);border-radius:12px}
 .leaflet-control-layers{padding:6px 10px;font-size:13px}.leaflet-bar{border:0!important}.leaflet-bar a{border-radius:8px!important;margin-bottom:4px}
 .hud{padding:6px 12px;font:400 12px "DM Mono",monospace}.leaflet-control-attribution{background:#11271bcc!important;color:var(--dim)!important}.leaflet-control-attribution a{color:var(--dim)!important}
@@ -46,10 +47,8 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--moss);outline-o
 .zl .tag{margin-top:6px;background:#11271bf0;border:1px solid var(--edge);border-left:3px solid var(--zc);border-radius:7px;padding:2px 9px;font:500 12px "Instrument Sans";color:var(--bone)}.zl .tag s{text-decoration:none;font:400 11px "DM Mono",monospace;color:var(--dim);margin-left:6px}
 @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--zc) 60%,transparent)}70%{box-shadow:0 0 0 18px #0000}100%{box-shadow:0 0 0 0 #0000}}
 .fire svg{display:block;filter:drop-shadow(0 0 5px #ff6a2bcc);transform-origin:50% 90%;animation:flick 1.3s ease-in-out infinite alternate}@keyframes flick{to{transform:scale(1.12) rotate(-3deg)}}
-.me{--f:1;transition:filter .2s}.me svg{display:block;transform:scaleX(var(--f));overflow:visible}.me .sh{fill:#000a}
-.me .l{transform-origin:18px 39px}.me .r{transform-origin:26px 39px}.me .af{transform-origin:28px 25px}.me .ab{transform-origin:11px 25px}.me.walk .l{animation:sw .3s ease-in-out infinite alternate}.me.walk .r{animation:sw .3s ease-in-out infinite alternate-reverse}.me.walk .af{animation:sa .3s ease-in-out infinite alternate}.me.walk .ab{animation:sa .3s ease-in-out infinite alternate-reverse}
-.me.walk .bd{animation:bob .3s ease-in-out infinite alternate}@keyframes sw{from{transform:rotate(-30deg)}to{transform:rotate(30deg)}}@keyframes sa{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}@keyframes bob{to{transform:translateY(-1.8px)}}
-.me.dig .af{animation:dig .34s ease-in-out 3}.me.dig .ab{animation:dig2 .34s ease-in-out 3}.me.dig .bd{animation:squat .34s ease-in-out 3}@keyframes dig{50%{transform:rotate(42deg) translateY(5px)}}@keyframes dig2{50%{transform:rotate(30deg)}}@keyframes squat{50%{transform:translateY(3px)}}
+.me{width:88px;height:112px;filter:drop-shadow(0 3px 2px #0008);transform-origin:50% 96%}
+[data-z=far] .me{transform:scale(.45)}[data-z=mid] .me{transform:scale(.7)}.me canvas{width:88px;height:112px;image-rendering:pixelated}
 .seed{animation:pop .5s cubic-bezier(.2,2,.4,1)}.seed svg{width:22px;height:22px}@keyframes pop{from{transform:scale(0)}}
 #modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:16px;z-index:9999}#modal.on{display:flex}
 #qbox{background:#14301f;border:1px solid var(--edge);border-radius:18px;padding:24px;max-width:440px;width:100%}#qbox h2{font:700 24px/1.2 Fraunces,serif;margin:4px 0 10px}
@@ -62,102 +61,150 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--moss);outline-o
 summary{cursor:pointer;font:600 13px "Instrument Sans"}details.sec .note{margin-top:8px}
 .clue{margin-top:8px;padding:11px 14px;border:1px solid var(--edge);border-left:3px solid var(--moss);border-radius:10px}.clue b{font:600 11px "DM Mono",monospace;color:var(--moss);text-transform:uppercase;letter-spacing:.1em}.clue p{margin-top:2px}
 .sec .btn{width:100%}
-@media(max-width:900px){#panel{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:42vh}.stats{right:10px;top:78px}.actions{display:none}}
+@media(max-width:900px){.actions{display:flex!important;bottom:calc(42vh + 24px);left:10px;transform:none;gap:4px}.actions button{padding:7px;font-size:11px}.actions kbd{display:none}#panel{top:auto;left:10px;right:10px;bottom:10px;width:auto;height:42vh}.stats{right:10px;top:78px}.actions{display:none}}
+#country,#city-filter{width:100%;background:var(--ink);color:var(--bone);border:1px solid var(--edge);border-radius:8px;padding:10px;font:inherit;margin-top:8px}
+#country-cities{max-height:240px;overflow:auto;margin-top:8px}
+.leaflet-tooltip.ctip{background:#11271bf0;border:1px solid var(--edge);color:var(--bone);font:500 11px "Instrument Sans",sans-serif;padding:1px 6px;box-shadow:none;border-radius:6px}.leaflet-tooltip-right.ctip:before{display:none}
+#sound-hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);background:#11271bdd;border:1px solid var(--edge);border-radius:999px;padding:8px 18px;font-weight:600;max-width:90vw;text-align:center}#sound-hint[hidden]{display:none}
+.lowzoom .zl{display:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+#panel-body{display:flex;flex-direction:column;gap:18px}#city-form{margin-top:8px}#city-query{min-width:0;flex:1;width:150px;background:var(--ink);color:var(--bone);border:1px solid var(--edge);border-radius:8px;padding:10px}#city-results .site{margin-top:6px}#city-results .site small{display:block;color:var(--dim)}#panel a{color:var(--moss)}#intro .skip{z-index:1}
 </style></head><body>
 <div id="map" tabindex="0"></div>
-<div class="brand"><small>Bangladesh · NASA Earth trends</small><h1>Forest <i>Detective</i></h1></div>
+<div class="brand"><small>Worldwide · NASA Earth trends</small><h1>Forest <i>Detective</i></h1></div>
 <div class="stats"><div class="stat"><span>SEEDLINGS</span><b id="seeds">0</b></div><div class="stat"><span>SCORE</span><b id="score">0</b></div>
-<div class="stat" id="fstat"><span><svg viewBox="0 0 24 24" fill="#ff6a2b"><path d="M12 2c.8 3-1 4.6-2.4 6.6C8.300 10.500 8 12 9 13.500c-1.800-.3-3-2-3-4C4 11 3 13 3 15c0 4 4 7 9 7s9-3 9-7c0-3.600-2.500-5.500-4-8.500-.5 1.800-1.500 2.800-3 3.200C14.500 7.500 14.500 4.500 12 2z"/></svg>FIRES 5D</span><b id="fires">–</b></div></div>
-<aside id="panel"></aside>
+<div class="stat" id="fstat"><span><svg viewBox="0 0 24 24" fill="#ff6a2b"><path d="M12 2c.8 3-1 4.6-2.4 6.6C8.300 10.500 8 12 9 13.500c-1.800-.3-3-2-3-4C4 11 3 13 3 15c0 4 4 7 9 7s9-3 9-7c0-3.600-2.500-5.500-4-8.500-.5 1.800-1.500 2.800-3 3.200C14.500 7.500 14.500 4.500 12 2z"/></svg>LOCAL FIRES 5D</span><b id="fires">–</b></div></div>
+<aside id="panel"><section aria-label="Find a city"><h3>Explore a city</h3>
+<form id="city-form" class="row"><input id="city-query" type="search" minlength="2" maxlength="100" placeholder="City name, e.g. Tokyo" aria-label="City name" required><button class="btn" type="submit">Search</button></form>
+<div id="city-results" aria-live="polite"></div><div class="note">Search uses the GeoNames city list. Add a country to narrow it, e.g. "London, Canada".</div></section><section aria-label="Countries and cities"><h3>Countries &amp; cities</h3>
+<select id="country" aria-label="Choose a country"><option value="">All countries · biggest cities</option></select>
+<input id="city-filter" type="search" placeholder="Filter this country's cities" aria-label="Filter cities" hidden>
+<div id="country-cities" class="sites" aria-live="polite"></div>
+<div class="note" id="geo-note">Every city above 5,000 people · <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a> (CC BY 4.0)</div></section>
+<div id="panel-body"></div></aside>
 <div class="actions"><button onclick="plant()"><kbd>E</kbd>Dig &amp; plant</button><button onclick="openCase()"><kbd>C</kbd>Case file</button><button onclick="quiz()"><kbd>Q</kbd>Quiz</button><button onclick="fires()"><kbd>F</kbd>Refresh fires</button></div>
-<div id="intro"><video id="iv" src="intro.mp4" autoplay muted playsinline></video><div class="skip"><button id="mute">Sound on</button><button id="skip">Skip intro</button></div></div>
+<div id="intro"><video id="iv" src="intro.mp4" preload="auto" playsinline></video><div id="sound-hint" role="status" hidden>Your browser blocked sound until you interact. Click or press any key to turn it on.</div><div class="skip"><button id="mute" hidden>Mute</button><button id="skip">Skip intro</button></div></div>
+<script src="intro.js"></script>
 <div id="modal"><div id="qbox"></div></div><div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="ranger.js"></script>
 <script>
 const API=location.protocol==="file:"?"http://localhost:8000":"";
 const $=id=>document.getElementById(id);
-const CC={climate:"#6fb3c9",human:"#e5694f",mixed:"#e0b24a",none:"#d9cfb0"},CL={climate:"Climate-driven loss",human:"Human-driven loss",mixed:"Mixed causes"};
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const CC={climate:"#6fb3c9",human:"#e5694f",mixed:"#e0b24a",none:"#d9cfb0"},CL={climate:"Climate-associated loss",human:"Loss not explained by climate",mixed:"Mixed / inconclusive"};
 const TREE='<svg viewBox="0 0 24 24"><path d="M12 2 5 12h4l-3 5h5v5h2v-5h5l-3-5h4z"/></svg>';
 const FLAME=z=>`<svg width="${z}" height="${z}" viewBox="0 0 24 24"><defs><linearGradient id="fg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#e8350f"/><stop offset=".6" stop-color="#ff8a2b"/><stop offset="1" stop-color="#ffd24a"/></linearGradient></defs><path fill="url(#fg)" d="M12 2c.8 3-1 4.6-2.4 6.6C8.300 10.500 8 12 9 13.500c-1.800-.3-3-2-3-4C4 11 3 13 3 15c0 4 4 7 9 7s9-3 9-7c0-3.600-2.500-5.500-4-8.500-.5 1.800-1.500 2.800-3 3.200C14.500 7.500 14.500 4.500 12 2z"/><path fill="#fff3b0" d="M12 21c-2.200 0-3.800-1.300-3.800-3.200 0-2 1.800-3 2.600-4.800.9 1.200 1.300 1.600 2.200 1.900.9.400 2.800 1.200 2.800 3.200 0 1.800-1.800 2.900-3.800 2.900z"/></svg>`;
-const ME=`<svg width="44" height="62" viewBox="0 0 44 62"><ellipse class="sh" cx="22" cy="58" rx="13" ry="3.5"/>
-<g class="bd">
-<g class="leg l"><rect x="15" y="38" width="6" height="15" rx="3" fill="#35432f"/><rect x="14" y="50" width="8" height="6" rx="2.5" fill="#2a1d14"/></g>
-<g class="leg r"><rect x="23" y="38" width="6" height="15" rx="3" fill="#35432f"/><rect x="22" y="50" width="8" height="6" rx="2.5" fill="#2a1d14"/></g>
-<rect x="5" y="22" width="11" height="17" rx="4" fill="#8a5a2b"/><rect x="5" y="22" width="11" height="5" rx="2.5" fill="#a06a33"/>
-<g class="arm ab"><rect x="8" y="23" width="6" height="15" rx="3" fill="#3f6230"/><circle cx="11" cy="38.5" r="3" fill="#d29f7b"/></g>
-<rect x="12" y="20" width="20" height="21" rx="6" fill="#58853f"/><rect x="12" y="35" width="20" height="3" fill="#2f4a22"/>
-<g class="arm af"><g transform="rotate(-12 29 37)"><rect x="27.8" y="21" width="2.4" height="32" rx="1" fill="#8b6a3d"/><path d="M24.5 51h9l-4.5 8z" fill="#aeb7b0"/></g>
-<rect x="25" y="23" width="6" height="15" rx="3" fill="#4a7234"/><circle cx="29" cy="38" r="3" fill="#e2b08a"/></g>
-<circle cx="22" cy="14" r="7.5" fill="#e2b08a"/><circle cx="25" cy="14" r="1.2" fill="#2a1d14"/><path d="M20 18q3 2 6 0" stroke="#a5724f" stroke-width="1" fill="none"/>
-<ellipse cx="22" cy="9.5" rx="14" ry="3.3" fill="#c9a45a"/><path d="M14 9.5C14 3 30 3 30 9.5z" fill="#dcb96e"/><rect x="14" y="7.5" width="16" height="2.6" fill="#7a4a1c"/></g></svg>`;
 const SEED='<svg viewBox="0 0 24 24"><path d="M12 22V11" stroke="#6b9a3a" stroke-width="2" stroke-linecap="round"/><path d="M12 12C6 12 4 8 4 4c5 0 8 2 8 8z" fill="#9ec27f"/><path d="M12 14c5 0 7-3 7-7-4.500 0-7 2.500-7 7z" fill="#7fb04a"/></svg>';
+const quizSet=[["What does tree cover measure?",["Ground covered by tree canopy","Wind speed","Ocean depth"],0],["Does a climate correlation prove a cause?",["No, more evidence is needed","Yes, always","Only at night"],0]];
 const HOT=[
- {n:"Sundarbans",lat:22.1,lon:89.2,r:35,note:"The world's largest mangrove forest. Pressure: rising salinity, sea-level rise, cyclones.",q:[["The Sundarbans is best known as?",["Largest mangrove forest","A desert","A glacier"],0],["Which climate effect hurts it most?",["Rising salinity","Colder winters","Less sunlight"],0]]},
- {n:"Chittagong Hill Tracts",lat:22.7,lon:92.1,r:40,note:"Hill forests under pressure from shifting cultivation, logging and new roads.",q:[["Which layer helps spot illegal clearing?",["Tree-cover loss near roads","Ocean tides","Moon phase"],0],["A major driver of hill forest loss?",["Clearing for farming","Snowfall","Volcanoes"],0]]},
- {n:"Sylhet hill forests",lat:24.9,lon:91.9,r:30,note:"Tea expansion and irregular rainfall are squeezing the hills.",q:[["What does NDVI measure?",["Vegetation greenness","Wind speed","Soil salt"],0],["Which crop expansion affects Sylhet?",["Tea","Wheat prairie","Cactus"],0]]},
- {n:"Madhupur Sal forest",lat:24.65,lon:90.05,r:25,note:"Sal forest cleared for farms, brick kilns and encroachment.",q:[["Madhupur is famous for which tree?",["Sal","Pine","Baobab"],0],["Is its loss mostly climate-driven?",["No, mostly human pressure","Yes, entirely","It is not changing"],0]]},
- {n:"Cox's Bazar coast",lat:21.45,lon:92.0,r:30,note:"Coastal green belt facing storms, erosion and shifting rainfall.",q:[["Which satellite family gives 30 m forest imagery?",["Landsat","Voyager","Apollo"],0],["Why plant coastal belts?",["Reduce storm damage","Make snow","Shade on Mars"],0]]}];
-const BBOX=[[20.6,88.0],[26.7,92.7]];
+ {n:"Dhaka · Bangladesh",lat:23.8103,lon:90.4125},
+ {n:"London · United Kingdom",lat:51.5074,lon:-0.1278},
+ {n:"New York · United States",lat:40.7128,lon:-74.0060},
+ {n:"Tokyo · Japan",lat:35.6762,lon:139.6503},
+ {n:"Nairobi · Kenya",lat:-1.2921,lon:36.8219},
+ {n:"Manaus · Brazil",lat:-3.1190,lon:-60.0217},
+ {n:"Sydney · Australia",lat:-33.8688,lon:151.2093},
+ {n:"Berlin · Germany",lat:52.5200,lon:13.4050}
+].map(h=>({...h,r:10,note:"Local satellite sample near this city centre; not a city-wide average or municipal boundary.",q:quizSet}));
+const coordText=(la,lo)=>`${Math.abs(la).toFixed(3)}°${la<0?'S':'N'} ${Math.abs(lo).toFixed(3)}°${lo<0?'W':'E'}`;
+const wrapLon=lo=>((lo+180)%360+360)%360-180;
 
 /* ---------- map ---------- */
-const map=L.map("map",{zoomControl:false,maxBounds:[[19,86],[28,94]],minZoom:6}).setView([23.7,90.3],7);
+const map=L.map("map",{zoomControl:false,maxBounds:[[-85,-180],[85,180]],maxBoundsViscosity:1,minZoom:2}).setView([20,15],2);
 L.control.zoom({position:"bottomleft"}).addTo(map);
 const pad=n=>String(n).padStart(2,"0"),iso=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const date0=new Date(Date.now()-3*864e5);
-function gibs(layer,lvl,ext,snap){const t=L.tileLayer("",{maxNativeZoom:lvl,maxZoom:12,attribution:"NASA GIBS"});
+function gibs(layer,lvl,ext,snap){const t=L.tileLayer("",{maxNativeZoom:lvl,maxZoom:12,className:"base",attribution:"NASA GIBS"});
  t.getTileUrl=c=>{let d=new Date($("dt")?$("dt").value:date0);if(isNaN(d))d=date0;if(snap){d=new Date(d-16*864e5);const j=Math.floor((d-new Date(d.getFullYear(),0,0))/864e5);d=new Date(d-((j-1)%8)*864e5)}
   return `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layer}/default/${iso(d)}/GoogleMapsCompatible_Level${lvl}/${c.z}/${c.y}/${c.x}.${ext}`};return t}
-const esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,attribution:"Esri, Maxar, Earthstar"}).addTo(map);
+const esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:16,className:"base",attribution:"Esri, Maxar, Earthstar"}).addTo(map);
 const modis=gibs("MODIS_Terra_CorrectedReflectance_TrueColor",9,"jpeg"),ndvi=gibs("MODIS_Terra_NDVI_8Day",9,"png",true);
-const loss=L.tileLayer("https://storage.googleapis.com/earthenginepartners-hansen/tiles/gfc_v1.11/loss_tree_gain/{z}/{x}/{y}.png",{maxNativeZoom:12,maxZoom:12,attribution:"Hansen/UMD/Google/USGS/NASA"});
-const fireG=L.layerGroup().addTo(map),natG=L.layerGroup().addTo(map);
-L.control.layers({"Satellite · Esri":esri,"NASA MODIS · daily":modis},{"Vegetation index · NASA MODIS":ndvi,"Forest loss · Hansen":loss,"National model grid":natG,"Active fires · NASA FIRMS":fireG},{position:"topleft",collapsed:false}).addTo(map);
-let divs=[];
-fetch("https://www.geoboundaries.org/api/current/gbOpen/BGD/ADM1/").then(r=>r.json()).then(m=>fetch(m.gjDownloadURL)).then(r=>r.json()).then(g=>{divs=g.features;
- L.geoJSON(g,{style:{color:"#f1e7d0",weight:1,dashArray:"2 6",fill:false,opacity:.55},interactive:false}).addTo(map)}).catch(()=>{});
-const inRing=(p,r)=>{let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const[xi,yi]=r[i],[xj,yj]=r[j];if((yi>p[1])!=(yj>p[1])&&p[0]<(xj-xi)*(p[1]-yi)/(yj-yi)+xi)c=!c}return c};
-const divAt=(la,lo)=>{for(const f of divs){const g=f.geometry,ps=g.type==="Polygon"?[g.coordinates]:g.coordinates;if(ps.some(p=>inRing([lo,la],p[0])))return f.properties.shapeName}return null};
-const zIcon=(h,c,t)=>L.divIcon({className:"",iconSize:[0,0],html:`<div class="zl" style="--zc:${c}"><div class="pin">${TREE}</div><div class="tag">${h.n}${t?`<s>${t}</s>`:""}</div></div>`});
-HOT.forEach(h=>{h.circ=L.circle([h.lat,h.lon],{radius:h.r*1000,color:CC.none,weight:2,fillColor:CC.none,fillOpacity:.09,className:"zone",interactive:false}).addTo(map);
- h.lab=L.marker([h.lat,h.lon],{icon:zIcon(h,CC.none,""),interactive:false,zIndexOffset:2000}).addTo(map)});
-async function prefetch(){for(const h of HOT){try{const r=await fetch(`${API}/api/forest?lat=${h.lat}&lon=${h.lon}`);if(!r.ok)continue;h.data=await r.json();
- const c=CC[h.data.cause];h.circ.setStyle({color:c,fillColor:c});h.lab.setIcon(zIcon(h,c,Math.round(h.data.cover.at(-1))+"%"));if(!cur)render()}catch(e){}}}
+/* ---------- navigation-style labels: collision-free city and country names on one canvas ---------- */
+const labels=(()=>{
+ const pane=map.createPane("labels");pane.style.zIndex=590;pane.style.pointerEvents="none";
+ const cv=document.createElement("canvas");cv.style.pointerEvents="none";pane.appendChild(cv);
+ const g=cv.getContext("2d"),widths=new Map(),FONT='"Instrument Sans",system-ui,sans-serif';
+ let cities=[],countries=[],visible=true,hits=[],raf=0;
+ function width(font,t){const k=font+"|"+t;let w=widths.get(k);if(w===undefined){g.font=font;w=g.measureText(t).width;if(widths.size>5000)widths.clear();widths.set(k,w)}return w}
+ const hit1=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
+ function draw(){raf=0;const s=map.getSize(),d=window.devicePixelRatio||1,z=map.getZoom(),W=Math.round(s.x*d),H=Math.round(s.y*d);
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;cv.style.width=s.x+"px";cv.style.height=s.y+"px"}
+  L.DomUtil.setPosition(cv,map.containerPointToLayerPoint([0,0]));
+  g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,s.x,s.y);hits=[];if(!visible)return;
+  const placed=[],free=r=>r.x>=2&&r.y>=2&&r.x+r.w<=s.x-2&&r.y+r.h<=s.y-2&&!placed.some(p=>hit1(r,p));
+  g.textBaseline="middle";g.lineJoin="round";g.textAlign="left";
+  for(const c of cities){const p=map.latLngToContainerPoint([c.lat,c.lon]);if(p.x<-30||p.y<-30||p.x>s.x+30||p.y>s.y+30)continue;
+   const big=c.pop>=1e6,font=`${big?600:500} ${big?13:12}px ${FONT}`,r=2.5+Math.min(3,Math.max(0,Math.log10(c.pop/5000))*1.1),w=width(font,c.name)+2,h=15,dot={x:p.x-r-1,y:p.y-r-1,w:2*r+2,h:2*r+2};
+   if(!free(dot))continue;
+   const spot=[{x:p.x+r+4,y:p.y-h/2},{x:p.x-r-4-w,y:p.y-h/2},{x:p.x-w/2,y:p.y-r-3-h},{x:p.x-w/2,y:p.y+r+3}].map(q=>({x:q.x,y:q.y,w,h})).find(free);
+   if(!spot)continue;                                   // no room: skip the whole place, no orphan dots
+   placed.push(dot,spot);hits.push({c,dot,spot});
+   g.beginPath();g.arc(p.x,p.y,r,0,6.2832);g.fillStyle="#f1e7d0";g.fill();g.lineWidth=1.2;g.strokeStyle="#11271b";g.stroke();
+   g.font=font;g.lineWidth=3.2;g.strokeStyle="rgba(8,22,14,.88)";g.strokeText(c.name,spot.x+1,spot.y+h/2+.5);g.fillStyle="#f6efdc";g.fillText(c.name,spot.x+1,spot.y+h/2+.5)}
+  if(z<=5){const font=`600 ${z<=3?10:11}px ${FONT}`,minN=z<=3?40:z===4?12:0;g.font=font;
+   for(const k of countries){if(k.n<minN)continue;const p=map.latLngToContainerPoint([(k.bbox[1]+k.bbox[3])/2,(k.bbox[0]+k.bbox[2])/2]),t=k.name.toUpperCase(),w=width(font,t)+t.length*1.5,h=14,r={x:p.x-w/2,y:p.y-h/2,w,h};
+    if(!free(r))continue;placed.push(r);g.font=font;g.textAlign="center";if("letterSpacing" in g)g.letterSpacing="1.5px";
+    g.lineWidth=3;g.strokeStyle="rgba(8,22,14,.8)";g.strokeText(t,p.x,p.y+.5);g.fillStyle="rgba(241,231,208,.82)";g.fillText(t,p.x,p.y+.5);if("letterSpacing" in g)g.letterSpacing="0px"}}
+ }
+ const schedule=()=>{if(!raf)raf=requestAnimationFrame(draw)};
+ map.on("move zoom viewreset resize",schedule);map.on("zoomstart",()=>{cv.style.opacity=0});map.on("zoomend",()=>{cv.style.opacity=1;schedule()});
+ return{set(list){cities=list||[];schedule()},setCountries(list){countries=list||[];schedule()},show(v){visible=v;schedule()},
+  hit(pt){const pad=3;for(const h of hits){for(const r of [h.spot,h.dot])if(pt.x>=r.x-pad&&pt.x<=r.x+r.w+pad&&pt.y>=r.y-pad&&pt.y<=r.y+r.h+pad)return h.c}return null},
+  placed:()=>hits.map(h=>({c:h.c,dot:h.dot,spot:h.spot})),draw}
+})();
+const cityG=new (L.Layer.extend({onAdd(){labels.show(true)},onRemove(){labels.show(false)}}))().addTo(map),fireG=L.layerGroup().addTo(map),natG=L.layerGroup().addTo(map);
+L.control.layers({"Satellite · Esri":esri,"NASA MODIS · daily":modis},{"Vegetation index · NASA MODIS":ndvi,"Cities · GeoNames":cityG,"Explored locations":natG,"Active fires · NASA FIRMS":fireG},{position:"topleft",collapsed:false}).addTo(map);
+const divAt=()=>null;
+const zIcon=(h,c,t)=>L.divIcon({className:"",iconSize:[0,0],html:`<div class="zl" style="--zc:${c}"><div class="pin">${TREE}</div><div class="tag">${esc(h.n)}${t?`<s>${t}</s>`:""}</div></div>`});
+function cityPin(h){h.lab=L.marker([h.lat,h.lon],{icon:zIcon(h,CC.none,""),zIndexOffset:2000}).addTo(map);h.lab.on("click",()=>jump(HOT.indexOf(h)))}
 const hud=L.control({position:"bottomleft"});hud.onAdd=()=>{const d=L.DomUtil.create("div","hud");d.id="hud";L.DomEvent.disableClickPropagation(d);return d};hud.addTo(map);
 
 /* ---------- character ---------- */
-const me={lat:22.6,lon:89.4,dir:1},keys={};
-const mk=L.marker([me.lat,me.lon],{icon:L.divIcon({className:"",html:`<div class="me" id="me">${ME}</div>`,iconSize:[44,62],iconAnchor:[22,58]}),zIndexOffset:1000}).addTo(map);
-map.on("click",e=>{me.lat=e.latlng.lat;me.lon=e.latlng.lng;moved()});
+const me={lat:23.8103,lon:90.4125,dir:"down"},keys={};
+const mk=L.marker([me.lat,me.lon],{icon:L.divIcon({className:"",html:`<div class="me" id="me"><canvas id="ranger" width="176" height="224" aria-label="Forest ranger"></canvas></div>`,iconSize:[88,112],iconAnchor:[44,108]}),zIndexOffset:1000}).addTo(map);
+map.on("click",e=>{const hit=labels.hit(e.containerPoint);if(hit){goCity(hit);return}me.lat=clamp(e.latlng.lat,-85,85);me.lon=wrapLon(e.latlng.lng);moved()});
 let cur=null,seeds=0,score=0,cause=null,rid=0,cl=null,fc=null,fcErr="",mode="T2M";
 const km=(a,b,c,d)=>{const R=6371,p=Math.PI/180,x=Math.sin((c-a)*p/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
-function loop(){const px=3.6*360/(256*2**map.getZoom());let m=false;
- if(keys.arrowup||keys.w){me.lat+=px;m=true}if(keys.arrowdown||keys.s){me.lat-=px;m=true}
- if(keys.arrowleft||keys.a){me.lon-=px;m=true;me.dir=-1}if(keys.arrowright||keys.d){me.lon+=px;m=true;me.dir=1}
- const el=mk.getElement();if(el){el.classList.toggle("walk",m);el.style.setProperty("--f",me.dir)}
- if(m){me.lat=Math.min(BBOX[1][0],Math.max(BBOX[0][0],me.lat));me.lon=Math.min(BBOX[1][1],Math.max(BBOX[0][1],me.lon));moved()}requestAnimationFrame(loop)}
-let ft;function moved(){mk.setLatLng([me.lat,me.lon]);map.panTo([me.lat,me.lon],{animate:false});
- $("hud").textContent=`${me.lat.toFixed(3)}°N  ${me.lon.toFixed(3)}°E  ·  ${divAt(me.lat,me.lon)||"Bangladesh"}`;
- const h=HOT.find(h=>km(me.lat,me.lon,h.lat,h.lon)<h.r);if(h!==cur){cur=h||null;if(cur)toast("Entered "+cur.n);ft=0}
+let lastFrame=0,digUntil=0;
+function loop(now=0){const dt=Math.min(32,now-lastFrame||16.67);lastFrame=now;
+ let dx=0,dy=0;
+ if(!$("modal").classList.contains("on")&&now>=digUntil){
+ if(keys.arrowup||keys.w)dy--;if(keys.arrowdown||keys.s)dy++;
+ if(keys.arrowleft||keys.a)dx--;if(keys.arrowright||keys.d)dx++;}
+ const moving=!!(dx||dy);
+ if(moving){me.dir=dx?(dx<0?"left":"right"):(dy<0?"up":"down");
+ const point=map.project([me.lat,me.lon]);const speed=3.6*dt/16.67/Math.hypot(dx,dy);
+ const pos=map.unproject(L.point(point.x+dx*speed,point.y+dy*speed));
+ me.lat=clamp(pos.lat,-85,85);me.lon=wrapLon(pos.lng);moved();}
+ Ranger.draw($("ranger"),me.dir,moving,now,digUntil);
+ requestAnimationFrame(loop)}
+let ft;function moved(pan=true){rid++;fc=null;cl=null;fcErr="";mk.setLatLng([me.lat,me.lon]);if(pan)map.panTo([me.lat,me.lon],{animate:false});
+ $("hud").textContent=`${coordText(me.lat,me.lon)} · WASD / arrows to walk · click anywhere`;
+ const h=[...HOT].sort((a,b)=>km(me.lat,me.lon,a.lat,a.lon)-km(me.lat,me.lon,b.lat,b.lon)).find(h=>km(me.lat,me.lon,h.lat,h.lon)<h.r);if(h!==cur){cur=h||null;if(cur)toast("Entered "+cur.n)}
  clearTimeout(ft);ft=setTimeout(analyse,450)}
 addEventListener("keydown",e=>{const k=e.key.toLowerCase();if($("modal").classList.contains("on")){if(k==="escape")closeQ();return}
- if(e.target.tagName==="INPUT")return;if(k.startsWith("arrow"))e.preventDefault();keys[k]=true;if(k==="e")plant();if(k==="q")quiz();if(k==="c")openCase();if(k==="f")fires()});
+ if(["INPUT","TEXTAREA","SELECT","BUTTON"].includes(e.target.tagName))return;if(k.startsWith("arrow"))e.preventDefault();keys[k]=true;if(!e.repeat&&k==="e")plant();if(k==="q")quiz();if(k==="c")openCase();if(k==="f")fires()});
 addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
-function jump(i){const h=HOT[i];me.lat=h.lat;me.lon=h.lon;map.setZoom(9);moved()}
+addEventListener("blur",()=>Object.keys(keys).forEach(k=>delete keys[k]));
+function jump(i){const h=HOT[i];me.lat=h.lat;me.lon=h.lon;map.setZoom(11);moved();fires()}
 
 /* ---------- NASA POWER climate ---------- */
 const pc={};
 async function power(lat,lon){const k=(Math.round(lat*2)/2)+","+(Math.round(lon*2)/2);if(pc[k])return pc[k];const[la,lo]=k.split(",");
- const j=await (await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=T2M,PRECTOTCORR&community=AG&latitude=${la}&longitude=${lo}&start=2001&end=2024&format=JSON`)).json(),p=j.properties.parameter,o={years:[],T2M:[],PRECTOTCORR:[]};
- for(let y=2001;y<=2024;y++){const t=p.T2M[y+"13"],r=p.PRECTOTCORR[y+"13"];if(t>-90&&r>-90){o.years.push(y);o.T2M.push(t);o.PRECTOTCORR.push(r)}}return pc[k]=o}
+ const j=await (await fetch(`https://power.larc.nasa.gov/api/temporal/monthly/point?parameters=T2M,PRECTOTCORR&community=AG&latitude=${la}&longitude=${lo}&start=2001&end=${new Date().getFullYear()-1}&format=JSON`)).json(),p=j.properties.parameter,o={years:[],T2M:[],PRECTOTCORR:[]};
+ for(let y=2001;y<new Date().getFullYear();y++){const t=p.T2M[y+"13"],r=p.PRECTOTCORR[y+"13"];if(t>-90&&r>-90){o.years.push(y);o.T2M.push(t);o.PRECTOTCORR.push(r)}}if(o.years.length<8)throw new Error("Insufficient climate data");return pc[k]=o}
 const mean=a=>a.reduce((x,y)=>x+y,0)/a.length,sd=a=>{const m=mean(a);return Math.sqrt(mean(a.map(v=>(v-m)**2)))||1};
 const fit=(x,y)=>{const mx=mean(x),my=mean(y);let n=0,d=0;x.forEach((v,i)=>{n+=(v-mx)*(y[i]-my);d+=(v-mx)**2});const s=n/d;return{s,b:my-s*mx}};
-async function analyse(){const id=++rid;fc=null;fcErr="";cl=null;render(true);
- try{cl=await power(me.lat,me.lon);cl.fT=fit(cl.years,cl.T2M);cl.fR=fit(cl.years,cl.PRECTOTCORR)}catch(e){}
+async function analyse(){const id=++rid,lat=me.lat,lon=me.lon,site=cur;render(true);
+ try{const data=await power(lat,lon);if(id!==rid)return;data.fT=fit(data.years,data.T2M);data.fR=fit(data.years,data.PRECTOTCORR);cl=data}catch(e){}
  if(id!==rid)return;render(true);
- try{const q=cur?[cur.lat,cur.lon]:[Math.floor(me.lat/.5)*.5+.25,Math.floor(me.lon/.5)*.5+.25];   /* reuse cached grid cells */
-  const r=await fetch(`${API}/api/forest?lat=${q[0]}&lon=${q[1]}`);if(r.ok)fc=await r.json();else fcErr=r.status===422?"No tree-cover data here (water or no trees)":((await r.json()).detail||"error")}catch(e){fcErr="backend offline"}
- if(id!==rid)return;render(false)}
+ try{const q=site?[site.lat,site.lon]:[lat,lon];
+ const r=await fetch(`${API}/api/forest?lat=${q[0].toFixed(2)}&lon=${q[1].toFixed(2)}`),data=await r.json();
+ if(id!==rid)return;
+ if(r.ok){fc=data;if(site)site.data=data;loadNational()}else fcErr=r.status===422?"Insufficient tree-cover data at this location":data.detail||"Data unavailable";
+ }catch(e){if(id!==rid)return;fcErr="backend offline"}
+ if(id===rid)render(false)}
 
 /* ---------- panel ---------- */
 function chart(c,ys,vs,fy,fv,col,lo,hi){const dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;const x=c.getContext("2d");x.scale(dpr,dpr);
@@ -172,30 +219,28 @@ function chart(c,ys,vs,fy,fv,col,lo,hi){const dpr=devicePixelRatio||1,w=c.client
  if(lo&&hi){x.beginPath();x.moveTo(X(n),Y(vs[n]));hi.forEach((v,j)=>x.lineTo(X(n+1+j),Y(v)));for(let j=lo.length-1;j>=0;j--)x.lineTo(X(n+1+j),Y(lo[j]));x.closePath();x.fillStyle="#e0b24a30";x.fill()}
  const ln=(a,b,cc,d)=>{x.beginPath();x.setLineDash(d);x.strokeStyle=cc;x.lineWidth=2;for(let i=a;i<=b;i++)i==a?x.moveTo(X(i),Y(V[i])):x.lineTo(X(i),Y(V[i]));x.stroke();x.setLineDash([])};
  ln(0,n,col,[]);ln(n,A.length-1,"#e0b24a",[5,4])}
-function render(loading){const P=$("panel"),dv=divAt(me.lat,me.lon);
+function render(loading){const P=$("panel-body"),dv=divAt(me.lat,me.lon);
  let c=null,pr=null;
  if(fc){c=fc.cause;pr=fc.cause_prob}
- else if(cl){const T=cl.T2M,R=cl.PRECTOTCORR,zT=(mean(T.slice(-5))-mean(T.slice(0,-5)))/sd(T),zR=(mean(R.slice(-5))-mean(R.slice(0,-5)))/sd(R);
-  if(!loading){c=(zT>.8||zR<-.8)?"climate":"human";pr=null}}
  cause=c;
  const idle=!cur;
- let h=`<div><div class="kick">${cur?"Now reading":"Free roam"}</div><div class="place">${cur?cur.n:(dv||"Bangladesh")}</div><div class="sub">${cur?cur.note:"Walk into a ringed forest, or pick one below."}</div></div>`;
- if(c)h+=`<div class="verdict" style="--c:${CC[c]}"><i></i><div><b>${CL[c]}</b><span>${pr!=null?Math.round(pr*100)+"% conf."+(fc&&fc.cause_p_value!=null?" · p="+fc.cause_p_value:""):"climate signal only · backend offline"}</span></div></div>`;
- else h+=`<div class="verdict" style="--c:${CC.none}"><i></i><div><b>${loading?"Reading satellite records…":"No data here"}</b><span>${fcErr||(loading&&cl?"Downloading MODIS tree cover… first visit can take ~30 s":"NASA POWER · MODIS")}</span></div></div>`;
+ let h=`<div><div class="kick">${cur?"Now reading":"Free roam"}</div><div class="place">${esc(cur?cur.n:(dv||"Selected location"))}</div><div class="sub">${cur?cur.note:"Search a city or choose a shortcut below. Click the map to sample a location."}</div></div>`;
+ if(c)h+=`<div class="verdict" style="--c:${CC[c]}"><i></i><div><b>${CL[c]}</b><span>${pr!=null?Math.round(pr*100)+" model score"+(fc&&fc.cause_p_value!=null?" · p="+fc.cause_p_value:""):"climate signal only · backend offline"}</span></div></div>`;
+ else h+=`<div class="verdict" style="--c:${CC.none}"><i></i><div><b>${loading?"Reading satellite records…":"No data here"}</b><span>${esc(fcErr)||(loading&&cl?"Downloading MODIS tree cover… first visit can take ~30 s":"NASA POWER · MODIS")}</span></div></div>`;
  if(cur)h+=`<button class="btn" onclick="openCase()">Open case file${cases[cur.n]&&cases[cur.n].solved?" · solved":""}</button>`;
  const cv=fc?fc.cover.at(-1):null,fe=fc?fc.forecast.at(-1):null;
  h+=`<div class="tiles"><div class="tile"><span>Tree cover ${fc?fc.years.at(-1):""}</span><b>${cv!=null?cv.toFixed(0)+"%":"—"}</b></div>
  <div class="tile"><span>Forecast 2035</span><b>${fe!=null?fe.toFixed(0)+"%":"—"}</b>${cv!=null?`<em>${(fe-cv>=0?"+":"")+(fe-cv).toFixed(1)} pts</em>`:""}</div>
  <div class="tile"><span>Loss in stress yrs</span><b>${fc?Math.round(fc.climate_loss_share*100)+"%":"—"}</b></div>
  <div class="tile"><span>Warming / decade</span><b>${cl?(cl.fT.s*10).toFixed(2)+"°":"—"}</b></div></div>
- <div class="sec"><h3>Forest cover · MODIS + model</h3><canvas id="fc"></canvas><div class="note">${fc?`Held-out error ±${fc.holdout_mae_pct??"?"} pts · dashed = forecast, shaded = 80% range`:(fcErr?"Backend: "+fcErr:"Loading tree-cover record…")}</div></div>
- <div class="sec"><h3>Climate · NASA POWER<span class="seg"><button class="${mode=="T2M"?"on":""}" onclick="mode='T2M';drawC()">TEMP</button><button class="${mode!="T2M"?"on":""}" onclick="mode='PRECTOTCORR';drawC()">RAIN</button></span></h3><canvas id="ch"></canvas><div class="note">Observed 2001–2024, linear projection to 2035.</div></div>`;
- if(idle)h+=`<div class="sec"><h3>Forest sites</h3><div class="sites">${HOT.map((z,i)=>`<button class="site" style="--c:${z.data?CC[z.data.cause]:CC.none}" onclick="jump(${i})"><i></i><b>${z.n}</b><span>${z.data?Math.round(z.data.cover.at(-1))+"%":"…"}</span></button>`).join("")}</div></div>`;
+ <div class="sec"><h3>Forest cover · MODIS + model</h3><canvas id="fc"></canvas><div class="note">${fc?`Held-out error ±${fc.holdout_mae_pct??"?"} pts · dashed = forecast, shaded = 80% range`:(fcErr?"Backend: "+esc(fcErr):"Loading tree-cover record…")}</div></div>
+ <div class="sec"><h3>Climate · NASA POWER<span class="seg" id="climate-toggle"><button class="${mode=="T2M"?"on":""}" onclick="mode='T2M';drawC()">TEMP</button><button class="${mode!="T2M"?"on":""}" onclick="mode='PRECTOTCORR';drawC()">RAIN</button></span></h3><canvas id="ch"></canvas><div class="note">Observed ${cl?cl.years[0]+"–"+cl.years.at(-1):"annual records"}; linear projection to 2035.</div></div>`;
+ h+=`<div class="sec"><h3>City shortcuts</h3><div class="sites">${HOT.map((z,i)=>`<button class="site" style="--c:${z.data?CC[z.data.cause]:CC.none}" onclick="jump(${i})"><i></i><b>${esc(z.n)}</b><span>${z.data?Math.round(z.data.cover.at(-1))+"%":"…"}</span></button>`).join("")}</div></div>`;
  h+=trendHTML()+natHTML()+`<div class="sec"><h3>Satellite date</h3><div class="row"><input type="date" id="dt" value="${$("dt")?$("dt").value:iso(date0)}" onchange="[modis,ndvi].forEach(l=>map.hasLayer(l)&&l.redraw())"><button class="btn ghost" onclick="lapse()">Play 2012 → now</button></div></div>`;h+=METHOD;
  const keep=P.scrollTop;P.innerHTML=h;P.scrollTop=keep;
  if(fc)chart($("fc"),fc.years,fc.cover,fc.forecast_years,fc.forecast,"#9ec27f",fc.forecast_lo,fc.forecast_hi);else chart($("fc"));drawC();drawTrend()}
-function drawC(){const c=$("ch");if(!c)return;document.querySelectorAll(".seg button").forEach((b,i)=>b.classList.toggle("on",(i==0)==(mode=="T2M")));
- if(!cl)return chart(c);const f=mode=="T2M"?cl.fT:cl.fR,fy=[...Array(11)].map((_,i)=>2025+i);chart(c,cl.years,cl[mode],fy,fy.map(y=>f.s*y+f.b),mode=="T2M"?"#e5694f":"#6fb3c9")}
+function drawC(){const c=$("ch");if(!c)return;document.querySelectorAll("#climate-toggle button").forEach((b,i)=>b.classList.toggle("on",(i==0)==(mode=="T2M")));
+ if(!cl)return chart(c);const f=mode=="T2M"?cl.fT:cl.fR,fy=Array.from({length:Math.max(0,2035-cl.years.at(-1))},(_,i)=>cl.years.at(-1)+1+i);chart(c,cl.years,cl[mode],fy,fy.map(y=>f.s*y+f.b),mode=="T2M"?"#e5694f":"#6fb3c9")}
 let tm;function lapse(){if(tm){clearInterval(tm);tm=0;return}if(!map.hasLayer(modis)){esri.remove();modis.addTo(map)}
  let y=2012;tm=setInterval(()=>{const d=new Date($("dt").value);d.setFullYear(y);$("dt").value=iso(d);modis.redraw();toast("MODIS · "+y);if(++y>new Date().getFullYear()){clearInterval(tm);tm=0}},1800)}
 
@@ -203,21 +248,27 @@ let tm;function lapse(){if(tm){clearInterval(tm);tm=0;return}if(!map.hasLayer(mo
 let FR=[];function plotFires(rows){FR=rows;fireG.clearLayers();
  rows.forEach(c=>{const z=Math.round(20+Math.min(18,(+c.frp||1)/2));
   L.marker([+c.latitude,+c.longitude],{icon:L.divIcon({className:"fire",iconSize:[z,z],iconAnchor:[z/2,z-2],html:FLAME(z)})}).addTo(fireG)
-  .bindPopup(`<b>Fire detected</b><br>${c.acq_date} ${String(c.acq_time||"").padStart(4,"0").replace(/(..)(..)/,"$1:$2")} UTC<br>Power ${c.frp||"?"} MW · confidence ${c.confidence||"?"}`)});
- $("fires").textContent=rows.length;$("fstat").title="NASA FIRMS · VIIRS · last 5 days";if(!rows.length)toast("FIRMS connected: no fires detected in Bangladesh in the last 5 days.")}
-async function fires(){try{const r=await fetch(API+"/api/fires"),j=await r.json();if(!r.ok)throw new Error(j.detail||("HTTP "+r.status));plotFires(j)}
- catch(e){$("fires").textContent="off";$("fstat").title=e.message;toast("Fires: "+e.message)}}
+  .bindPopup(`<b>Fire detected</b><br>${esc(c.acq_date)} ${esc(String(c.acq_time||"").padStart(4,"0").replace(/(..)(..)/,"$1:$2"))} UTC<br>Power ${esc(c.frp||"?")} MW · confidence ${esc(c.confidence||"?")}`)});
+ $("fires").textContent=rows.length;$("fstat").title="NASA FIRMS · VIIRS · last 5 days · 25 km bounding window around selected city/location";if(!rows.length)toast("FIRMS connected: no fires detected in the selected city/local window in the last 5 days.")}
+let fireRequest=0,fireLocation=null;
+async function fires(){const id=++fireRequest,lat=me.lat,lon=me.lon;$("fires").textContent="…";
+ try{const r=await fetch(`${API}/api/fires?lat=${lat.toFixed(2)}&lon=${lon.toFixed(2)}`),j=await r.json();if(id!==fireRequest)return;if(!r.ok)throw new Error(j.detail||("HTTP "+r.status));fireLocation={lat,lon};plotFires(j)}
+ catch(e){if(id!==fireRequest)return;FR=[];fireLocation=null;fireG.clearLayers();$("fires").textContent="off";$("fstat").title=e.message;toast("Fires: "+e.message)}}
 
 /* ---------- game ---------- */
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t.h);t.h=setTimeout(()=>t.classList.remove("on"),3000)}
-function plant(){if(!cur)return toast("Walk into a ringed forest first.");if(!(cases[cur.n]&&cases[cur.n].solved))return toast("Solve this site's case file first (press C).");const el=mk.getElement();el.classList.add("dig");setTimeout(()=>el.classList.remove("dig"),1000);
- const cz=cur.data?cur.data.cause:cause;if(cz!=="climate"&&cz!=="mixed")return toast(cz==="human"?"Human-driven loss here: protect the forest, planting alone won't hold.":"Still reading this site's data…");
- setTimeout(()=>{L.marker([me.lat+(Math.random()-.5)*.03,me.lon+(Math.random()-.5)*.03],{icon:L.divIcon({className:"",html:`<div class="seed">${SEED}</div>`,iconSize:[22,22],iconAnchor:[11,20]})}).addTo(map);
-  seeds++;$("seeds").textContent=seeds;toast("Seedling planted in "+cur.n)},500)}
+function plant(){if(performance.now()<digUntil)return;
+ if(!cur)return toast("Choose a city or move near a city pin first.");
+ if(!(cases[cur.n]&&cases[cur.n].solved))return toast("Solve this site's case file first (press C).");
+ const site=cur,lat=me.lat,lon=me.lon,cz=site.data?site.data.cause:cause;
+ if(cz!=="climate"&&cz!=="mixed")return toast("Protect this forest; planting alone is not a solution here.");
+ digUntil=performance.now()+1200;
+ setTimeout(()=>{L.marker([lat,lon],{icon:L.divIcon({className:"",html:`<div class="seed">${SEED}</div>`,iconSize:[22,22],iconAnchor:[11,20]})}).addTo(map);
+ seeds++;$("seeds").textContent=seeds;toast("Seedling planted in "+site.n)},1100)}
 function closeQ(){$("modal").classList.remove("on");$("map").focus()}
-function quiz(){if(!cur)return toast("Walk into a ringed forest for its quiz.");const qs=cur.q,b=$("qbox");let i=0;
- const show=()=>{if(i>=qs.length){b.innerHTML=`<div class="kick">${cur.n}</div><h2>Quiz complete</h2><p>Total score: <b>${score}</b></p><br><button class="btn" onclick="closeQ()">Back to the map</button>`;return}
-  const[q,o,a]=qs[i];b.innerHTML=`<div class="kick">${cur.n} · ${i+1} of ${qs.length}</div><h2>${q}</h2>`+o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join("");
+function quiz(){if(!cur)return toast("Choose a city for its quiz.");const qs=cur.q,b=$("qbox");let i=0;
+ const show=()=>{if(i>=qs.length){b.innerHTML=`<div class="kick">${esc(cur.n)}</div><h2>Quiz complete</h2><p>Total score: <b>${score}</b></p><br><button class="btn" onclick="closeQ()">Back to the map</button>`;return}
+  const[q,o,a]=qs[i];b.innerHTML=`<div class="kick">${esc(cur.n)} · ${i+1} of ${qs.length}</div><h2>${q}</h2>`+o.map((t,k)=>`<button class="opt" data-k="${k}">${t}</button>`).join("");
   b.querySelectorAll(".opt").forEach(z=>z.onclick=()=>{b.querySelectorAll(".opt").forEach(y=>y.disabled=true);b.querySelectorAll(".opt")[a].classList.add("ok");
    if(+z.dataset.k===a){score+=10;$("score").textContent=score}else z.classList.add("no");setTimeout(()=>{i++;show()},900)})};
  $("modal").classList.add("on");show()}
@@ -225,33 +276,34 @@ function quiz(){if(!cur)return toast("Walk into a ringed forest for its quiz.");
 /* ---------- national model grid + validation ---------- */
 let NAT=null,natMode="loss",VAL=null;const clamp=(v,a,b)=>Math.min(b,Math.max(a,v)),sgn=v=>(v>=0?"+":"")+v.toFixed(1);
 function natColor(c){if(natMode==="cause")return CC[c.cause];const t=clamp(-(natMode==="loss"?c.delta:c.fc_delta)/20,0,1),a=[95,158,79],z=[229,105,79];return`rgb(${a.map((v,i)=>Math.round(v+(z[i]-v)*t)).join(",")})`}
-function drawNat(){natG.clearLayers();(NAT?NAT.cells:[]).forEach(c=>L.rectangle([[c.lat-.25,c.lon-.25],[c.lat+.25,c.lon+.25]],{weight:0,fillColor:natColor(c),fillOpacity:.5})
+function drawNat(){natG.clearLayers();(NAT?NAT.cells:[]).forEach(c=>L.circleMarker([c.lat,c.lon],{radius:7,weight:1,color:natColor(c),fillColor:natColor(c),fillOpacity:.6})
  .addTo(natG).bindTooltip(`${c.cover0.toFixed(0)}% → ${c.cover1.toFixed(0)}% (${sgn(c.delta)} pts)<br>2035 forecast: ${c.fc.toFixed(0)}%<br>${CL[c.cause]}`))}
-async function loadNational(){try{NAT=await (await fetch(API+"/api/national")).json();drawNat();render();
- if(NAT.running)setTimeout(loadNational,12000);else if(!VAL){const v=await fetch(API+"/api/validate");if(v.ok){VAL=await v.json();render()}}}catch(e){}}
+async function loadNational(){try{NAT=await (await fetch(API+"/api/explored")).json();drawNat();render();
+ if(NAT.running)setTimeout(loadNational,12000);else{const v=await fetch(API+"/api/validate");if(v.ok){VAL=await v.json();render()}}}catch(e){}}
 function natHTML(){const s=NAT&&NAT.summary;
- let h=`<div class="sec"><h3>National model grid<span class="seg">${[["loss","LOSS"],["cause","CAUSE"],["fc","2035"]].map(([m,l])=>`<button class="${natMode==m?"on":""}" onclick="natMode='${m}';drawNat();render()">${l}</button>`).join("")}</span></h3>`;
+ let h=`<div class="sec"><h3>Explored locations<span class="seg">${[["loss","LOSS"],["cause","CAUSE"],["fc","2035"]].map(([m,l])=>`<button class="${natMode==m?"on":""}" onclick="natMode='${m}';drawNat();render()">${l}</button>`).join("")}</span></h3>`;
  if(!NAT)h+=`<div class="note">Waiting for backend…</div>`;
- else{h+=`<div class="note">${NAT.done}/${NAT.total} cells processed${NAT.running?" · computing in background…":""}${NAT.skipped?` · ${NAT.skipped} water cells skipped`:""}${NAT.failed?` · ${NAT.failed} errors`:""}</div>`;
-  if(s&&s.n)h+=`<div class="note">Across ${s.n} forested cells: tree cover ${sgn(s.mean_delta)} pts on average since ${s.year0}. Loss linked to climate in ${s.climate}%, to human pressure in ${s.human}%, mixed in ${s.mixed}%.</div>`}
+ else{h+=`<div class="note">On-demand samples only. ${NAT.done}/${NAT.total} cells processed${NAT.running?" · computing in background…":""}${NAT.skipped?` · ${NAT.skipped} water cells skipped`:""}${NAT.failed?` · ${NAT.failed} errors`:""}</div>`;
+  if(s&&s.n)h+=`<div class="note">Across ${s.n} explored samples (not a global estimate): tree cover ${sgn(s.mean_delta)} pts on average since ${s.year0}. Loss linked to climate in ${s.climate}%, unexplained by climate in ${s.human}%, inconclusive in ${s.mixed}%.</div>`}
  if(VAL)h+=`<div class="note"><b>Validation:</b> median held-out forecast error ±${VAL.median_mae} pts${VAL.median_naive!=null?` (repeat-last-year baseline ±${VAL.median_naive}; model wins in ${VAL.pct_beats_naive}% of cells)`:""}; cause label beats chance (p≤0.15) in ${VAL.pct_beats_chance}% of cells.${VAL.gfw?` Agreement with GFW drivers: ${VAL.gfw.agreement}% (n=${VAL.gfw.n}).`:" GFW agreement not run yet (add gfw_drivers.csv)."}</div>`;
  return h+"</div>"}
 const METHOD=`<details class="sec"><summary>Method &amp; limits</summary><p class="note">Data: MODIS MOD44B tree cover (250 m, yearly), NASA POWER climate, NASA FIRMS fires. Forecast: ridge regression on year plus temperature and rain anomalies, with an 80% range from a residual bootstrap. Cause: share of tree-cover loss in hot or dry years compared with chance, tested by circular-shift permutations (p-value).</p><p class="note">Limits: about 20 yearly points per site; association is not proof of cause; MODIS pixels are coarse; the forecast assumes past climate trends continue. Check against ground truth before using it for policy.</p></details>`;
 
 /* ---------- case files ---------- */
-const cases={};let CASE=null;
-async function openCase(){if(!cur)return toast("Walk into a ringed forest to open its case file.");const d=cur.data;if(!d)return toast("Still gathering evidence for this site…");
- let c=null;try{c=await power(cur.lat,cur.lon);c.fT=fit(c.years,c.T2M);c.fR=fit(c.years,c.PRECTOTCORR)}catch(e){}
+const cases=Object.create(null);let CASE=null;
+async function openCase(){if(!cur)return toast("Choose a city to open its case file.");const site=cur,d=site.data;if(!d)return toast("Still gathering evidence for this site…");
+ let c=null;try{c=await power(site.lat,site.lon);c.fT=fit(c.years,c.T2M);c.fR=fit(c.years,c.PRECTOTCORR)}catch(e){}
+ if(cur!==site)return;
  const st=cases[cur.n]||(cases[cur.n]={used:{},solved:false}),near=FR.filter(f=>km(+f.latitude,+f.longitude,cur.lat,cur.lon)<cur.r).length,ev=d.loss_events||[],dl=d.cover.at(-1)-d.cover[0];
  const clues=[["Canopy record",`MODIS tree cover went from ${d.cover[0].toFixed(0)}% in ${d.years[0]} to ${d.cover.at(-1).toFixed(0)}% in ${d.years.at(-1)} (${sgn(dl)} points).`],
   ["Climate file",c?`Temperature trend ${(c.fT.s*10).toFixed(2)} °C per decade. Rainfall trend ${(c.fR.s*10).toFixed(2)} mm/day per decade (NASA POWER).`:"Climate record unavailable."],
-  ["Fire watch",`${near} live VIIRS fire detection${near==1?"":"s"} inside this site in the last 5 days. This is live data, not history.`],
+  ["Fire watch",`${fireLocation&&km(fireLocation.lat,fireLocation.lon,cur.lat,cur.lon)<100?near+" VIIRS detections inside this site in the last 5 days.":"Refresh fires at this site to check recent detections."} This is recent data, not historical evidence.`],
   ["Loss timeline",ev.length?ev.map(e=>`${e.year}: ${sgn(-e.drop)} pts in a ${e.stressed?"hot or dry period":"normal climate period"}`).join(" · "):"No sharp yearly drops recorded."]];
  CASE={st,d,clues};caseDraw();$("modal").classList.add("on")}
 function caseDraw(){const{st,d,clues}=CASE,n=Object.keys(st.used).length,pts=Math.max(10,40-8*n),b=$("qbox");
- const res=()=>{const ok=st.guess===d.cause;return`<div class="verdict" style="--c:${CC[d.cause]};margin-top:14px"><i></i><div><b>Model verdict: ${CL[d.cause]}</b><span>${Math.round(d.cause_prob*100)}% conf. · p=${d.cause_p_value??"n/a"} · you ${ok?"matched it":"differed"} (+${st.pts})</span></div></div>
-  <p class="note">${d.cause==="human"?"Loss is not explained by hot or dry years, which points to clearing. Protect and patrol; planting alone will not hold here.":"Loss lines up with hot or dry years. Press E to dig and plant a climate-resilient seedling."} This is a statistical association from ${d.years.length} yearly points, not proof of cause.</p>`};
- b.innerHTML=`<div class="kick">Case file · ${cur.n}</div><h2>What is driving the loss here?</h2><p class="note">Examine evidence, then accuse. Fewer clues, more points${st.solved?"":` (${pts} now)`}.</p>`+
+ const res=()=>{const ok=st.guess===d.cause;return`<div class="verdict" style="--c:${CC[d.cause]};margin-top:14px"><i></i><div><b>Model verdict: ${CL[d.cause]}</b><span>${Math.round(d.cause_prob*100)} model score · p=${d.cause_p_value??"n/a"} · you ${ok?"matched it":"differed"} (+${st.pts})</span></div></div>
+  <p class="note">${d.cause==="human"?"Loss is not explained by this temperature/rainfall model. This does not establish human causation. Protect and patrol; planting alone will not hold here.":"Loss lines up with hot or dry years. Press E to dig and plant a climate-resilient seedling."} This is a statistical association from ${d.years.length} yearly points, not proof of cause.</p>`};
+ b.innerHTML=`<div class="kick">Case file · ${esc(cur.n)}</div><h2>What is driving the loss here?</h2><p class="note">Examine evidence, then match the model. Fewer clues, more points${st.solved?"":` (${pts} now)`}.</p>`+
   clues.map((k,i)=>st.used[i]||st.solved?`<div class="clue"><b>${k[0]}</b><p>${k[1]}</p></div>`:`<button class="opt" onclick="CASE.st.used[${i}]=1;caseDraw()">Examine: ${k[0]}</button>`).join("")+
   (st.solved?res():`<div class="row" style="margin-top:14px">${["climate","human","mixed"].map(x=>`<button class="btn ghost" style="flex:1;border-color:${CC[x]}" onclick="accuse('${x}')">${x[0].toUpperCase()+x.slice(1)}</button>`).join("")}</div>`)+
   `<div class="row" style="margin-top:14px"><button class="btn ghost" onclick="closeQ()">Close</button></div>`}
@@ -259,14 +311,14 @@ function accuse(g){const{st,d}=CASE,n=Object.keys(st.used).length;st.guess=g;st.
 /* ---------- Trend Lab ---------- */
 const TL={data:null,sel:null,loading:false,where:""};
 const fmtP=p=>p<.001?"<0.001":p.toFixed(3),sg=v=>(v>=0?"+":"")+(Math.abs(v)<.01&&v!==0?v.toExponential(1):v.toFixed(2));
-const DEMOS=[["Is Dhaka warming?",23.81,90.41,"T2M"],["Sylhet: wetter or drier?",24.9,91.87,"PRECTOTCORR"],["Cox's Bazar soil wetness",21.45,92.0,"GWETROOT"]];
-async function scanTrends(pick){if(TL.loading)return;TL.loading=true;TL.data=null;TL.where=`${me.lat.toFixed(2)}°N ${me.lon.toFixed(2)}°E`;render();
- try{const r=await fetch(`${API}/api/trend?lat=${me.lat.toFixed(3)}&lon=${me.lon.toFixed(3)}&vars=all`),j=await r.json();if(!r.ok)throw new Error(j.detail||r.status);
+const DEMOS=[["Manaus rainfall",-3.119,-60.0217,"PRECTOTCORR"],["Berlin warming",52.52,13.405,"T2M"],["Sydney soil wetness",-33.87,151.21,"GWETROOT"]];
+async function scanTrends(pick){if(TL.loading)return;TL.loading=true;TL.data=null;const scanLat=me.lat,scanLon=me.lon;TL.where=coordText(scanLat,scanLon);render();
+ try{const r=await fetch(`${API}/api/trend?lat=${scanLat.toFixed(3)}&lon=${scanLon.toFixed(3)}&vars=all`),j=await r.json();if(!r.ok)throw new Error(j.detail||r.status);
   TL.data=j.results;TL.sel=pick&&j.results[pick]?pick:Object.values(j.results).sort((a,b)=>a.p_mk-b.p_mk)[0].var}catch(e){toast("Trend scan: "+e.message)}
  TL.loading=false;render();
- if(TL.data){try{const q=cur?[cur.lat,cur.lon]:[Math.floor(me.lat/.5)*.5+.25,Math.floor(me.lon/.5)*.5+.25];
+ if(TL.data){try{const q=[scanLat,scanLon];
   const r=await fetch(`${API}/api/trend?lat=${q[0]}&lon=${q[1]}&vars=TREECOVER`);if(r.ok&&TL.data){Object.assign(TL.data,(await r.json()).results);render()}}catch(e){}}}
-function demo(i){const d=DEMOS[i];me.lat=d[1];me.lon=d[2];map.setView([me.lat,me.lon],8);moved();scanTrends(d[3])}
+function demo(i){const d=DEMOS[i];me.lat=d[1];me.lon=d[2];map.setView([me.lat,me.lon],11);moved();scanTrends(d[3])}
 function trendHTML(){
  let h=`<div class="sec"><h3>Trend Lab</h3><p class="note" style="margin:0 0 10px">Choose a place, scan every NASA variable there, and see which ones are really changing, by how much, and whether it is statistically significant.</p>
  <div class="row" style="margin-bottom:10px">${DEMOS.map((d,i)=>`<button class="btn ghost" style="width:auto;padding:6px 10px;font-size:12px" onclick="demo(${i})">${d[0]}</button>`).join("")}</div>
@@ -290,11 +342,51 @@ function drawTrend(){const s=TL.data&&TL.data[TL.sel],c=$("tc");if(!s||!c)return
  x.beginPath();s.years.forEach((t,i)=>i?x.lineTo(X(t+.5),Y(s.annual[i])):x.moveTo(X(t+.5),Y(s.annual[i])));x.strokeStyle="#9ec27f";x.lineWidth=2;x.stroke();
  x.beginPath();x.setLineDash([6,4]);x.moveTo(X(x0+.5),Y(s.trend_line[0]));x.lineTo(X(x1-.5),Y(s.trend_line.at(-1)));x.strokeStyle="#e0b24a";x.lineWidth=2;x.stroke();x.setLineDash([])}
 
-/* ---------- intro video ---------- */
-(function(){const o=$("intro"),v=$("iv");let done=false;
- const end=()=>{if(done)return;done=true;o.classList.add("off");v.pause();setTimeout(()=>o.remove(),700);$("map").focus()};
- v.onended=end;v.onerror=end;$("skip").onclick=end;$("mute").onclick=()=>{v.muted=!v.muted;$("mute").textContent=v.muted?"Sound on":"Sound off"};
- addEventListener("keydown",e=>{if(done)return;if(["Escape","Enter"," "].includes(e.key))end();e.stopImmediatePropagation();e.preventDefault()},true);
- v.play().catch(()=>{});setTimeout(()=>{if(!done&&v.readyState===0)end()},4000)})();
-moved();loop();fires();prefetch();loadNational();
+/* ---------- city search ---------- */
+let citySearchId=0,cityResults=[];
+$("city-form").addEventListener("submit",async e=>{e.preventDefault();
+ const q=$("city-query").value.trim(),id=++citySearchId;if(q.length<2)return;
+ const box=$("city-results");box.textContent="Searching cities…";
+ try{const r=await fetch(`${API}/api/cities?q=${encodeURIComponent(q)}`),data=await r.json();
+ if(id!==citySearchId)return;if(!r.ok)throw new Error(data.detail||"Search failed");cityResults=data.results;
+ box.replaceChildren();if(!cityResults.length)box.textContent="No city found. Try 'Name, Country'.";
+ cityResults.forEach(c=>{const btn=document.createElement("button");btn.type="button";btn.className="site";
+ const label=document.createElement("b");label.textContent=c.name;const detail=document.createElement("small");detail.textContent=[c.admin1,c.country].filter(Boolean).join(", ");label.appendChild(detail);btn.appendChild(label);
+ btn.onclick=()=>{goCity(c);box.replaceChildren()};box.appendChild(btn)})
+ }catch(err){if(id===citySearchId)box.textContent=err.message}
+});
+/* ---------- worldwide countries and cities (GeoNames) ---------- */
+const popMin=z=>z<=2?3e6:z===3?1e6:z===4?4e5:z===5?2e5:z===6?1e5:z===7?5e4:z===8?2e4:0;
+const popTxt=p=>p>=1e6?(p/1e6).toFixed(1)+" M":p>=1e3?Math.round(p/1e3)+" k":String(p);
+let selCC="",countryData=[],countryCities=[],viewId=0,viewTimer;
+function goCity(c){let index=HOT.findIndex(h=>km(h.lat,h.lon,c.lat,c.lon)<1);
+ if(index<0){HOT.push({n:[c.name,c.country].filter(Boolean).join(" · "),lat:c.lat,lon:c.lon,r:10,note:"Local satellite sample near this city centre; not a city-wide average or municipal boundary.",q:quizSet});index=HOT.length-1;cityPin(HOT[index])}
+ jump(index);$("map").focus()}
+async function loadCities(){const id=++viewId,b=map.getBounds(),z=map.getZoom(),cc=selCC;
+ const q=new URLSearchParams({w:clamp(b.getWest(),-180,180),s:clamp(b.getSouth(),-90,90),e:clamp(b.getEast(),-180,180),n:clamp(b.getNorth(),-90,90),min_pop:cc?0:popMin(z),limit:cc?500:400});if(cc)q.set("cc",cc);
+ try{const r=await fetch(`${API}/api/places?${q}`),j=await r.json();if(id!==viewId)return;if(!r.ok)throw new Error(j.detail||"City data unavailable");
+  labels.set(j.results);
+  $("geo-note").textContent=`${j.results.length} places in view${cc?"":" · zoom in for smaller cities"} · GeoNames (CC BY 4.0)`}
+ catch(e){if(id===viewId)$("geo-note").textContent=e.message}}
+map.on("moveend",()=>{clearTimeout(viewTimer);viewTimer=setTimeout(loadCities,350)});
+async function loadCountries(){const sel=$("country");
+ try{const r=await fetch(`${API}/api/countries`),j=await r.json();if(!r.ok)throw new Error(j.detail||"Country list unavailable");countryData=j.countries;
+  labels.setCountries(countryData);countryData.forEach(c=>{const o=document.createElement("option");o.value=c.cc;o.textContent=`${c.name} (${c.n})`;sel.appendChild(o)});loadCities()}
+ catch(e){$("geo-note").textContent=e.message;setTimeout(loadCountries,15000)}}
+function renderCountryList(){const box=$("country-cities"),q=$("city-filter").value.trim().toLowerCase();box.replaceChildren();
+ const rows=countryCities.filter(c=>!q||c.name.toLowerCase().includes(q));
+ rows.slice(0,80).forEach(c=>{const b=document.createElement("button");b.type="button";b.className="site";b.style.setProperty("--c","#d9cfb0");
+  const i=document.createElement("i"),nm=document.createElement("b"),p=document.createElement("span");nm.textContent=c.name;p.textContent=popTxt(c.pop);b.append(i,nm,p);b.onclick=()=>goCity(c);box.appendChild(b)});
+ if(!rows.length)box.textContent="No matching city.";
+ else if(rows.length>80){const m=document.createElement("div");m.className="note";m.textContent=`Showing 80 of ${rows.length}. Type to filter.`;box.appendChild(m)}}
+$("city-filter").addEventListener("input",renderCountryList);
+$("country").addEventListener("change",async e=>{selCC=e.target.value;const f=$("city-filter"),box=$("country-cities");box.replaceChildren();f.hidden=!selCC;f.value="";countryCities=[];
+ if(!selCC){loadCities();return}
+ const c=countryData.find(x=>x.cc===selCC);if(c){const[w,s,ee,n]=c.bbox;map.flyToBounds([[s,w],[n,ee]],{padding:[40,40],maxZoom:9})}
+ loadCities();
+ try{const r=await fetch(`${API}/api/country-cities?cc=${encodeURIComponent(selCC)}&limit=1000`),j=await r.json();if(!r.ok)throw new Error(j.detail||"Cities unavailable");
+  if(selCC!==e.target.value)return;countryCities=j.results;renderCountryList()}
+ catch(err){box.textContent=err.message}});
+const zl=()=>{const z=map.getZoom();document.body.classList.toggle("lowzoom",z<5);document.body.dataset.z=z<=3?"far":z<=5?"mid":"near"};map.on("zoomend",zl);zl();
+moved(false);loop();loadNational();loadCountries();loadCities();
 </script></body></html>

@@ -64,11 +64,13 @@ def mann_kendall(x, y):
 def stats_annual(var, years, annual, monthly=None):
     x, y = np.asarray(years, float), np.asarray(annual, float); n = len(x)
     if n < 8: raise ValueError("need at least 8 years, have %d" % n)
+    if not np.isfinite(x).all() or not np.isfinite(y).all() or len(set(x)) != n:
+        raise ValueError("Years must be unique and values finite")
     xm = x.mean(); sxx = ((x - xm) ** 2).sum()
     slope = float(((x - xm) * (y - y.mean())).sum() / sxx); icpt = float(y.mean() - slope * xm)
     res = y - (icpt + slope * x); df = n - 2
     se = math.sqrt((res ** 2).sum() / df / sxx) if sxx > 0 else 0.0
-    p_ols = t_p(slope / se, df) if se > 0 else 1.0
+    p_ols = t_p(slope / se, df) if se > 1e-12 else (0.0 if abs(slope) > 1e-12 else 1.0)
     tc = t_crit(df); r2 = 1 - (res ** 2).sum() / (((y - y.mean()) ** 2).sum() or 1)
     s, z, p_mk, sen = mann_kendall(x, y)
     sig = (p_ols < 0.05) + (p_mk < 0.05)

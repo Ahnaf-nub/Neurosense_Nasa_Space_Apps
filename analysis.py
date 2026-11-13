@@ -11,8 +11,8 @@ def _lin(x, y):
     s, b = np.polyfit(x, y, 1); return lambda v: s * np.asarray(v, float) + b
 
 def analyse(c_years, cover, p_years, temp, rain, end_year=2035):
-    cy = {int(y): v for y, v in zip(c_years, cover) if v == v}
-    py = {int(y): (t, r) for y, t, r in zip(p_years, temp, rain)}
+    cy = {int(y): v for y, v in zip(c_years, cover) if np.isfinite(v) and 0 <= v <= 100}
+    py = {int(y): (t, r) for y, t, r in zip(p_years, temp, rain) if np.isfinite(t) and np.isfinite(r)}
     years = sorted(y for y in cy if y in py)
     if len(years) < 8:
         raise ValueError("not enough overlapping years (%d)" % len(years))
@@ -33,6 +33,7 @@ def analyse(c_years, cover, p_years, temp, rain, end_year=2035):
         naive = float(np.mean(np.abs(cov[-4] - cov[-3:])))   # baseline: repeat the last training year
     model = _ridge_fit(X, cov)
 
+    end_year = max(end_year, max(years) + 1)
     fy = list(range(max(years) + 1, end_year + 1))
     ft = _lin(y_arr, T)(fy); fr = _lin(y_arr, R)(fy)
     ftz, frz = (ft - tm) / ts, (fr - rm) / rs

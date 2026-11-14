@@ -115,15 +115,6 @@ test_*.py/.cjs   Offline tests
 | `GET /api/cities?q=` | City search ("London, Canada" narrows by country) |
 | `GET /api/countries`, `/api/country-cities?cc=`, `/api/places?w&s&e&n` | Country list, a country's cities, cities in a map window |
 
-## Intro video and sound
-
-`static/intro.mp4` starts automatically. Browsers block sound until the visitor interacts with the page, so the video starts muted and sound switches on at the first click, tap or key press. For presenting with sound and no click, start a Chromium browser with `--autoplay-policy=no-user-gesture-required`.
-
-## Credits and AI use
-
-- **NASA data and imagery:** MODIS MOD44B tree cover, NASA POWER, NASA FIRMS, NASA GIBS. *We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).*
-- **Other:** [GeoNames](https://www.geonames.org/) city data (CC BY 4.0), Esri World Imagery, [Leaflet](https://leafletjs.com/), Google Fonts (Fraunces, Instrument Sans, DM Mono), FastAPI, Uvicorn, HTTPX, NumPy.
-
 ## Team
 
 **Team Neurosense**, Dhaka, Bangladesh. Built for the NASA Space Apps Challenge 2026.
